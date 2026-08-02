@@ -393,7 +393,98 @@ Free tiers: Jina offers 1M free embedding tokens/month; DeepSeek pricing is
 ~$0.02/M tokens (a full evaluation run costs a few cents). The embedding
 step (~3.7k chunks) runs on Jina's free tier.
 
-## 11. License
+## 11. Glossary
+
+Terminology used throughout this project, explained in plain language.
+
+### Core RAG concepts
+
+- **RAG (Retrieval-Augmented Generation)** — a pattern where the LLM's
+  answer is grounded in documents retrieved from a knowledge base, instead
+  of relying only on its training data. Steps: retrieve relevant chunks →
+  feed them to the LLM as context → generate an answer with citations.
+- **Chunk / Chunking** — splitting a long document into smaller pieces
+  (here: per *BAB* / *Pasal* section). Each chunk is embedded and stored
+  separately so retrieval can find the exact relevant part of a 50-page
+  regulation.
+- **Embedding** — a numerical vector (list of numbers) that captures the
+  *meaning* of a text. Similar texts get similar vectors, which is what
+  enables semantic search. This project uses **Jina AI
+  (`jina-embeddings-v3`)**, 1024 dimensions, multilingual (supports
+  Indonesian).
+- **Vector database** — a store optimized for similarity search over
+  embeddings. Here: **PGVector**, a PostgreSQL extension (not a separate
+  database — it lives inside Postgres).
+- **HNSW index** — *Hierarchical Navigable Small World*: the graph-based
+  algorithm PGVector uses to answer "give me the 5 most similar vectors"
+  quickly, even with thousands of chunks.
+- **Cosine similarity** — the distance metric used by the HNSW index to
+  compare embeddings (angle between vectors, 0..1). `vector_cosine_ops`
+  in the index definition refers to this.
+
+### Retrieval strategies
+
+- **Dense retrieval** — semantic search over embeddings (PGVector cosine).
+  Understands meaning, synonyms, and paraphrases.
+- **Sparse / FTS (Full-Text Search)** — keyword search over the text using
+  PostgreSQL `tsvector` + `GIN` index. Exact terms, good for codes like
+  "POJK", "QRIS", "KPMM".
+- **Hybrid search** — running dense + FTS together and merging results.
+- **RRF (Reciprocal Rank Fusion)** — the merging method: for each
+  candidate, sum `1 / (k + rank)` from each strategy (k=60 default).
+  Simple, robust, no score normalization needed. Best retrieval strategy
+  in this project's evaluation (MRR 0.667).
+- **Reranking** — after retrieval returns top-10 candidates, a second,
+  more precise model (Jina `jina-reranker-v2-base-multilingual`,
+  a cross-encoder) re-scores them to pick the top-5. Improves precision
+  at the cost of one extra API call.
+- **Query rewriting** — before retrieval, the LLM rewrites the user's
+  query: expands acronyms (KPMM → Kewajiban Penyediaan Modal Minimum),
+  adds context, fixes typos. Improves recall on jargon-heavy queries.
+
+### Pipeline & infrastructure
+
+- **dlt (data load tool)** — the Python library used for the ingestion
+  pipeline: reads chunk files, infers a schema, and loads them into
+  PostgreSQL with incremental merge on `chunk_id`. Re-runs are safe
+  (no duplicate chunks).
+- **`dataset_name`** — dlt's term for the Postgres schema where it
+  creates tables (here: `regulatory`).
+- **Pipeline** — the full ingestion flow: PDF → extract text → chunk →
+  embed → load into PGVector. Each step is a script in `scripts/`.
+- **PGVector** — see *Vector database* above.
+- **Docker Compose** — the tool that runs the 3 services
+  (`pgvector`, `grafana`, `streamlit`) together with one command.
+- **Containerization** — packaging an app with its dependencies into a
+  container image so it runs identically anywhere.
+
+### LLM & evaluation
+
+- **LLM-as-a-Judge** — using an LLM to score another LLM's answers
+  (instead of a human). Two prompt versions (v1: strict citations,
+  v2: structured) were compared; the judge scored v1 higher (3.92 vs
+  3.84 with DeepSeek as judge), so v1 is the default.
+- **Hit Rate** — fraction of test queries where the correct document was
+  retrieved in the top-k results.
+- **MRR (Mean Reciprocal Rank)** — for each query, `1 / rank` of the
+  first correct result, averaged. Higher = relevant docs appear earlier.
+- **Ground truth** — a curated set of (query → expected document)
+  pairs used to measure retrieval quality.
+- **Prompt version** — a variation of the system prompt given to the LLM.
+  This project evaluates 2 versions and picks the better one.
+
+### Monitoring
+
+- **Grafana** — the open-source dashboard tool that visualizes data from
+  PostgreSQL (query volume, feedback, token usage, per-conversation
+  detail).
+- **Datasource** — Grafana's connection to a data source (here: the
+  `PostgreSQL` datasource, UID `PG`, pointing at the `pgvector` service).
+- **Provisioning** — configuring Grafana (datasources + dashboards) via
+  files baked into the custom image, so a fresh `docker compose up`
+  gets a fully configured Grafana with no manual clicks.
+
+## 12. License
 
 MIT — educational project. Regulatory documents remain property of their
 issuers (OJK / Bank Indonesia), reproduced for educational purposes under

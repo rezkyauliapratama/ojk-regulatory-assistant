@@ -139,6 +139,101 @@
         "defaults": { "unit": "short" },
         "overrides": []
       }
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "Avg Tokens / Query",
+      "datasource": { "type": "postgres", "uid": "PG" },
+      "gridPos": { "h": 4, "w": 8, "x": 0, "y": 16 },
+      "targets": [
+        {
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT ROUND(AVG(usage_tokens)) AS avg_tokens FROM regulatory.conversations WHERE usage_tokens IS NOT NULL",
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "PG" }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "short" },
+        "overrides": []
+      }
+    },
+    {
+      "id": 8,
+      "type": "stat",
+      "title": "Avg Docs Cited",
+      "datasource": { "type": "postgres", "uid": "PG" },
+      "gridPos": { "h": 4, "w": 8, "x": 8, "y": 16 },
+      "targets": [
+        {
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT ROUND(AVG(jsonb_array_length(docs))) AS avg_docs FROM regulatory.conversations",
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "PG" }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "short" },
+        "overrides": []
+      }
+    },
+    {
+      "id": 9,
+      "type": "stat",
+      "title": "Feedback Positif (%)",
+      "datasource": { "type": "postgres", "uid": "PG" },
+      "gridPos": { "h": 4, "w": 8, "x": 16, "y": 16 },
+      "targets": [
+        {
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT ROUND(100.0 * count(*) FILTER (WHERE feedback = 'up') / NULLIF(count(*), 0), 1) AS pct FROM regulatory.conversations WHERE feedback IS NOT NULL",
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "PG" }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "percent" },
+        "overrides": []
+      }
+    },
+    {
+      "id": 10,
+      "type": "table",
+      "title": "Recent Conversations (Detail)",
+      "datasource": { "type": "postgres", "uid": "PG" },
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 20 },
+      "targets": [
+        {
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT created_at, query, LEFT(answer, 300) AS answer_preview, prompt_version, model, usage_tokens, COALESCE(feedback, '-') AS feedback, (SELECT string_agg(doc_id, ', ') FROM jsonb_to_recordset(docs) AS r(doc_id text)) AS cited_docs FROM regulatory.conversations ORDER BY created_at DESC LIMIT 50",
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "PG" }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "filterable": true }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "answer_preview" },
+            "properties": [
+              { "id": "custom.width", "value": 500 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "query" },
+            "properties": [
+              { "id": "custom.width", "value": 250 }
+            ]
+          }
+        ]
+      }
     }
   ],
   "refresh": "5s",
