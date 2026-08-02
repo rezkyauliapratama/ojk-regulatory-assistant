@@ -36,15 +36,39 @@ cp .env.example .env        # fill in API keys
 # 2. Start infrastructure (Postgres + Grafana + Streamlit)
 docker compose up -d
 
-# 3. Install Python deps
-pip install -e ".[dev]"
+# 3. Install Python deps (Python 3.11+)
+pip install -r requirements.txt
 
-# 4. Ingest regulations (downloads PDFs → chunks → embeddings → PGVector)
-python scripts/ingest.py
+# 4. Ingest regulations (PDFs already in data/pdfs/ — no download needed)
+python scripts/ingest.py        # loads chunks + embeddings into PGVector
+python scripts/setup_vector.py  # creates vector(384) column + HNSW index
 
-# 5. Open the chat UI
+# 5. Verify retrieval works
+python scripts/verify.py
+
+# 6. Open the chat UI
+streamlit run app/app.py
 open http://localhost:8501
 ```
+
+### Ingesting from scratch (re-download PDFs)
+
+PDFs are committed under `data/pdfs/`, but you can re-fetch from the
+canonical OJK/BI URLs at any time:
+
+```bash
+python scripts/fetch_pdfs.py     # 15 docs -> data/pdfs/
+python scripts/extract_text.py   # PDF -> data/extracted/*.txt
+python scripts/chunk.py          # -> data/chunks/*.jsonl (~3.7k chunks)
+python scripts/embed.py          # -> data/embeddings/*.npy (multilingual-e5-small)
+python scripts/ingest.py         # dlt -> PostgreSQL
+python scripts/setup_vector.py   # pgvector HNSW index
+python scripts/verify.py         # smoke test
+```
+
+> **Note:** `embed.py` runs on CPU by default (~45 min for 3.7k chunks on a
+> 2-core VM). Set `EMBEDDING_MODEL=intfloat/multilingual-e5-base` in `.env`
+> for higher quality (768-dim) if you have a GPU or more CPU.
 
 ## Project Structure
 

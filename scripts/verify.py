@@ -20,10 +20,19 @@ SAMPLE_QUERIES = [
 def main() -> int:
     conn = psycopg2.connect(os.environ["DATABASE_URL"])
     cur = conn.cursor()
-    cur.execute("SELECT COUNT(*) FROM regulation_chunks")
-    n = cur.fetchone()[0]
+    cur.execute("SELECT COUNT(*) FROM ojk.regulation_chunks")
+    n = cur.fetchone()[0] or 0
     print(f"Total chunks in PGVector: {n}")
     assert n > 0, "No chunks loaded!"
+    # quick retrieval sanity: query FTS for a known term
+    cur.execute("""
+        SELECT text FROM ojk.regulation_chunks
+        WHERE text ILIKE '%kecerdasan artifisial%'
+        LIMIT 1
+    """)
+    row = cur.fetchone()
+    if row:
+        print(f"Sample hit: '{row[0][:80]}...'")
     cur.close()
     conn.close()
     print("Verify OK — retrieval ready.")
