@@ -27,8 +27,6 @@ load_dotenv(ROOT / ".env")
 def chunks_resource():
     for jsonl in sorted(CHUNKS_DIR.glob("*.jsonl")):
         doc_id = jsonl.stem
-        emb_path = EMB_DIR / f"{doc_id}.npy"
-        vectors = np.load(emb_path) if emb_path.exists() else None
         for i, line in enumerate(jsonl.open(encoding="utf-8")):
             c = json.loads(line)
             yield {
@@ -37,7 +35,6 @@ def chunks_resource():
                 "pasal": c.get("pasal", ""),
                 "ayat": c.get("ayat", ""),
                 "text": c["text"],
-                "embedding": vectors[i].tolist() if vectors is not None else None,
             }
 
 
