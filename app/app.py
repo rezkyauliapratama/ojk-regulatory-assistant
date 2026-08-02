@@ -308,8 +308,11 @@ def main() -> None:
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
-            if msg["role"] == "assistant" and msg.get("docs"):
-                render_citation(msg["docs"], msg.get("lang", lang))
+            if msg["role"] == "assistant":
+                if msg.get("docs"):
+                    render_citation(msg["docs"], msg.get("lang", lang))
+                if msg.get("conv_id"):
+                    render_feedback(msg["conv_id"], msg.get("lang", lang))
 
     # query input
     query = st.chat_input(tr("chat_placeholder", lang))
@@ -353,7 +356,7 @@ def main() -> None:
                     render_feedback(conv_id, lang)
 
         st.session_state.messages.append(
-            {"role": "assistant", "content": answer_text, "docs": docs, "lang": lang}
+            {"role": "assistant", "content": answer_text, "docs": docs, "lang": lang, "conv_id": conv_id}
         )
 
 
