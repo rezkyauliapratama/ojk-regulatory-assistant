@@ -363,7 +363,101 @@ docker exec -i rag-pgvector psql -U rag -d rag_db \
   < scripts/seed_grafana_demo.sql
 ```
 
-## 9. Evaluation Criteria Mapping
+## 9. Nyawa Memory Layer (Bonus Feature)
+
+### What is Nyawa?
+
+[Nyawa](https://github.com/rezkyauliapratama/nyawa) ("soul" in Indonesian)
+is an **offline-first AI memory engine** written in Go. It is a single
+~8 MB binary with zero runtime dependencies (just SQLite): semantic
+memory recall (HNSW + FTS5 hybrid search), a built-in RAG engine,
+namespaces, and an MCP server so any AI agent can talk to it.
+
+```
+go build + one binary -> memory that lasts, no cloud, no Docker, no vector DB
+```
+
+### Why Nyawa here?
+
+- **Cross-session conversation memory** — the chat UI stores every Q&A
+  pair and recalls related past conversations, so users get continuity
+  across sessions (the `Use session memory (Nyawa)` checkbox in the
+  sidebar).
+- **Offline & private** — all memory lives in a local SQLite file
+  (`data/nyawa_memory.db`); nothing leaves the machine.
+- **Zero infrastructure** — no separate service, no API key, no network.
+- **Evaluated as a bonus** — it adds the *cross-session recall* bonus
+  point in the rubric (see §10) without complicating the architecture.
+- **Open source** — MIT-licensed, so reviewers can audit exactly how the
+  memory layer behaves.
+
+### Source
+
+| | |
+|---|---|
+| Repository | https://github.com/rezkyauliapratama/nyawa |
+| Language | Go 1.23+ |
+| License | MIT |
+| Latest release | v1.0.0 (80 commits, stable) |
+| Build size | ~8.1 MB (single binary) |
+
+### Install — Option A: download a release binary (fastest)
+
+```bash
+# Linux x86_64
+curl -L -o nyawa.gz https://github.com/rezkyauliapratama/nyawa/releases/download/v1.0.0/nyawa-linux-amd64.gz
+gunzip nyawa.gz && chmod +x nyawa && mv nyawa ./nyawa/nyawa
+
+# macOS (arm64) — build from source (no prebuilt darwin release yet), see Option B
+```
+
+### Install — Option B: build from source (macOS / any platform)
+
+Requires [Go 1.23+](https://go.dev/dl/).
+
+```bash
+git clone https://github.com/rezkyauliapratama/nyawa.git
+cd nyawa
+make build                # -> ./nyawa  (uses sqlite_fts5 build tag)
+
+# macOS Apple Silicon: cross-compile target for your OS
+GOOS=darwin GOARCH=arm64 go build -tags "sqlite_fts5" -ldflags="-s -w" -o nyawa ./cmd/nyawa/
+
+# verify
+./nyawa --version         # Nyawa — Offline-First AI Memory Engine v1.0.0
+
+# place it where this project expects it
+mkdir -p ../ojk-regulatory-assistant/nyawa
+cp nyawa ../ojk-regulatory-assistant/nyawa/nyawa
+```
+
+### Wire it into this project
+
+```bash
+# 1. .env (defaults already point here, adjust if you moved things)
+NYAWA_BINARY=./nyawa/nyawa
+NYAWA_DB=./data/nyawa_memory.db
+
+# 2. Start the app — the memory layer auto-detects the binary
+docker compose up -d --build streamlit
+# or locally: streamlit run app/app.py
+
+# 3. In the sidebar: tick "Use session memory (Nyawa)"
+#    - green "Available" = binary found
+#    - amber warning with the expected path = binary missing
+```
+
+The integration lives in `app/memory_layer.py` (thin MCP-over-stdio
+wrapper): each Q&A is stored via `nyawa_store` and related conversations
+are recalled via `nyawa_recall` on every query. Recall metrics
+(n_results, avg/max relevance score) are also logged to
+`regulatory.nyawa_recalls` and shown in the Grafana dashboard (§8).
+
+> Nyawa is fully optional. Without the binary the app degrades
+> gracefully — the memory checkbox simply has no effect and the chat
+> keeps working normally.
+
+## 10. Evaluation Criteria Mapping
 
 | Criterion | Implementation | Points |
 |-----------|----------------|--------|
@@ -381,7 +475,7 @@ docker exec -i rag-pgvector psql -U rag -d rag_db \
 | Best practice: query rewriting | LLM expands acronyms (KPMM, ITSK, PJP...) | +1 |
 | Bonus: Nyawa memory layer | Offline memory engine, cross-session recall | +1 |
 
-## 10. Costs & API usage
+## 11. Costs & API usage
 
 | Service | Usage | Key in `.env` |
 |---------|-------|---------------|
@@ -393,7 +487,7 @@ Free tiers: Jina offers 1M free embedding tokens/month; DeepSeek pricing is
 ~$0.02/M tokens (a full evaluation run costs a few cents). The embedding
 step (~3.7k chunks) runs on Jina's free tier.
 
-## 11. Glossary
+## 12. Glossary
 
 Terminology used throughout this project, explained in plain language.
 
@@ -484,7 +578,7 @@ Terminology used throughout this project, explained in plain language.
   files baked into the custom image, so a fresh `docker compose up`
   gets a fully configured Grafana with no manual clicks.
 
-## 12. License
+## 13. License
 
 MIT — educational project. Regulatory documents remain property of their
 issuers (OJK / Bank Indonesia), reproduced for educational purposes under
