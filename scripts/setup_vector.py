@@ -40,6 +40,22 @@ def main() -> int:
     """)
     print("HNSW cosine index created")
 
+    # FTS index for hybrid search (Bahasa Indonesia config if available)
+    cur.execute("""
+        ALTER TABLE ojk.regulation_chunks
+        ADD COLUMN IF NOT EXISTS text_tsv tsvector
+    """)
+    cur.execute("""
+        UPDATE ojk.regulation_chunks
+        SET text_tsv = to_tsvector('simple', coalesce(text, ''))
+        WHERE text_tsv IS NULL
+    """)
+    cur.execute("""
+        CREATE INDEX IF NOT EXISTS idx_chunks_fts
+        ON ojk.regulation_chunks USING gin (text_tsv)
+    """)
+    print("FTS tsvector + GIN index created")
+
     cur.execute("SELECT count(*) FROM ojk.regulation_chunks WHERE embedding IS NOT NULL")
     n = cur.fetchone()[0]
     print(f"Chunks with embeddings: {n}")
