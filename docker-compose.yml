@@ -17,13 +17,19 @@ services:
       retries: 10
 
   grafana:
-    image: grafana/grafana:11.2.0
+    build:
+      context: ./grafana
+      dockerfile: Dockerfile
+    image: ojk-grafana
     container_name: ojk-grafana
     ports:
       - "3000:3000"
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      POSTGRES_USER: ${POSTGRES_USER:-ojk}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me}
+      POSTGRES_DB: ${POSTGRES_DB:-ojk_regulatory}
     volumes:
       - grafana_data:/var/lib/grafana
     depends_on:

@@ -1,0 +1,155 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Pertanyaan per Hari",
+      "datasource": { "type": "postgres", "uid": "PG" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT created_at AS time, count(*) FROM ojk.conversations WHERE $__timeFilter(created_at) GROUP BY 1 ORDER BY 1",
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "PG" }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "short" },
+        "overrides": []
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Total Pertanyaan",
+      "datasource": { "type": "postgres", "uid": "PG" },
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT count(*) AS total FROM ojk.conversations",
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "PG" }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "short", "color": { "mode": "thresholds" } },
+        "overrides": []
+      }
+    },
+    {
+      "id": 3,
+      "type": "barchart",
+      "title": "Feedback Pengguna (👍/👎)",
+      "datasource": { "type": "postgres", "uid": "PG" },
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 0 },
+      "targets": [
+        {
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT COALESCE(feedback, 'none') AS feedback, count(*) FROM ojk.conversations GROUP BY 1",
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "PG" }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "short" },
+        "overrides": []
+      }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Token per Pertanyaan",
+      "datasource": { "type": "postgres", "uid": "PG" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT created_at AS time, usage_tokens FROM ojk.conversations WHERE $__timeFilter(created_at) ORDER BY 1",
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "PG" }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "short" },
+        "overrides": []
+      }
+    },
+    {
+      "id": 5,
+      "type": "piechart",
+      "title": "Prompt Version",
+      "datasource": { "type": "postgres", "uid": "PG" },
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT prompt_version, count(*) FROM ojk.conversations GROUP BY 1",
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "PG" }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "short" },
+        "overrides": []
+      }
+    },
+    {
+      "id": 6,
+      "type": "barchart",
+      "title": "Dokumen Paling Banyak Dikutip",
+      "datasource": { "type": "postgres", "uid": "PG" },
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 8 },
+      "targets": [
+        {
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT doc_id, count(*) AS n FROM ojk.conversations, jsonb_to_recordset(docs) AS r(doc_id text) GROUP BY 1 ORDER BY n DESC LIMIT 10",
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "PG" }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "short" },
+        "overrides": []
+      }
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 39,
+  "tags": ["ojk", "rag"],
+  "templating": { "list": [] },
+  "time": { "from": "now-7d", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "OJK RAG Monitoring",
+  "uid": "ojk-rag-monitoring",
+  "version": 1,
+  "weekStart": ""
+}
