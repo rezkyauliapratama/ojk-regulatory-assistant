@@ -1,0 +1,28 @@
+# --- Secrets ---
+.env
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# --- Generated data (NOT committed — reproducible from data/pdfs) ---
+data/extracted/
+data/chunks/
+data/nyawa_memory.db
+*.duckdb
+*.db
+
+# --- Test artifacts (cleaned after verification) ---
+tests/output/
+sample_test/
+*.log
+
+# --- IDE / OS ---
+.idea/
+.vscode/
+.DS_Store

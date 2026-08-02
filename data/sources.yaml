@@ -1,0 +1,157 @@
+# OJK/BI Regulatory Document Manifest
+# 15 documents — AI/technology governance, payment systems, banking.
+# PDFs are committed under data/pdfs/ (public domain, UU 28/2014 Pasal 42).
+# URL is the canonical source; used for verification & re-fetch.
+
+documents:
+  # --- AI / Technology (priority 1) ---
+  - id: ojk-ai-governance-banking-2025
+    type: guidance
+    issuer: ojk
+    title: "Tata Kelola Kecerdasan Artifisial Perbankan Indonesia"
+    year: 2025
+    url: "https://www.ojk.go.id/id/Publikasi/Roadmap-dan-Pedoman/Perbankan/Documents/Tata%20Kelola%20Kecerdasan%20Artifisial%20Perbankan%20Indonesia.pdf"
+    filename: "OJK_AI_Governance_Banking_2025.pdf"
+    category: ai
+
+  - id: pojk-11-2022
+    type: pojk
+    issuer: ojk
+    title: "Penyelenggaraan Teknologi Informasi oleh Bank Umum"
+    number: "11/POJK.03/2022"
+    year: 2022
+    url: "https://ojk.go.id/id/regulasi/Documents/Pages/Penyelenggaraan-Teknologi-Informasi-Oleh-Bank-Umum/POJK%2011%20-%2003%20-%202022.pdf"
+    filename: "POJK_11_2022_Teknologi_Informasi_Bank_Umum.pdf"
+    category: ai
+
+  - id: seojk-29-2022
+    type: seojk
+    issuer: ojk
+    title: "Ketahanan dan Keamanan Siber Bagi Bank Umum"
+    number: "29/SEOJK.03/2022"
+    year: 2022
+    url: "https://www.ojk.go.id/id/regulasi/Documents/Pages/Ketahanan-dan-Keamanan-Siber-Bagi-Bank-Umum/SEOJK%2029%20SEOJK.03%202022.pdf"
+    filename: "SEOJK_29_2022_Keamanan_Siber_Bank_Umum.pdf"
+    category: ai
+
+  - id: pojk-30-2025
+    type: pojk
+    issuer: ojk
+    title: "Penerapan Tata Kelola dan Manajemen Risiko Bagi Penyelenggara Inovasi Teknologi Sektor Keuangan (ITSK)"
+    number: "30/POJK.01/2025"
+    year: 2025
+    url: "https://ojk.go.id/id/regulasi/Documents/Pages/POJK-Nomor-30-Tahun-2025-Penerapan-Tata-Kelola-dan-Manajemen-Risiko-Bagi-Penyelenggara-Inovasi-Teknologi-Sektor-Keuangan/POJK%2030%20Tahun%202025%20Penerapan%20Tata%20Kelola%20dan%20Manajemen%20Risiko%20Bagi%20Penyelenggara%20Inovasi%20Teknologi%20Sektor%20Keuangan.pdf"
+    filename: "POJK_30_2025_Tata_Kelola_ITSK.pdf"
+    category: ai
+
+  - id: padk-1-2026
+    type: padk
+    issuer: ojk
+    title: "Penyelenggaraan Teknologi Informasi oleh Bank Umum (pelaksana POJK 11/2022)"
+    number: "1/PADK.03/2026"
+    year: 2026
+    url: "https://ojk.go.id/id/regulasi/Documents/Pages/PADK-1-Tahun-2026-Penyelenggaraan-Teknologi-Informasi-oleh-Bank-Umum/PADK%201%20Tahun%202026%20Penyelenggaraan%20Teknologi%20Informasi%20oleh%20Bank%20Umum.pdf"
+    filename: "PADK_1_2026_Teknologi_Informasi_Bank_Umum.pdf"
+    category: ai
+
+  # --- Payment Systems (priority 2) ---
+  - id: pbi-10-2025
+    type: pbi
+    issuer: bi
+    title: "Pengaturan Industri Sistem Pembayaran (PISP)"
+    number: "10/PBI/2025"
+    year: 2025
+    url: "https://www.bi.go.id/id/publikasi/peraturan/Documents/PBI-102025.pdf"
+    filename: "PBI_10_2025_Industri_Sistem_Pembayaran.pdf"
+    category: payment
+
+  - id: padg-32-2025
+    type: padg
+    issuer: bi
+    title: "Pengaturan Industri Sistem Pembayaran (pelaksana PBI 10/2025)"
+    number: "32/PADG/2025"
+    year: 2025
+    url: "https://www.bi.go.id/id/publikasi/peraturan/Documents/PADG-322025-Rev.pdf"
+    filename: "PADG_32_2025_Industri_Sistem_Pembayaran.pdf"
+    category: payment
+
+  - id: pbi-24-2022-valas
+    type: pbi
+    issuer: bi
+    title: "Transaksi di Pasar Valuta Asing"
+    number: "24/7/PBI/2022"
+    year: 2022
+    url: "https://www.bi.go.id/id/publikasi/peraturan/Documents/PBI_242022.pdf"
+    filename: "PBI_24_2022_Pasar_Valuta_Asing.pdf"
+    category: payment
+
+  - id: padg-24-2022-valas
+    type: padg
+    issuer: bi
+    title: "Transaksi Pasar Valuta Asing (turunan PBI 24/7/2022)"
+    number: "24/10/PADG/2022"
+    year: 2022
+    url: "https://www.bi.go.id/id/publikasi/peraturan/Documents/PADG_241022.pdf"
+    filename: "PADG_24_2022_Pasar_Valuta_Asing.pdf"
+    category: payment
+
+  - id: padg-3-2025-qris
+    type: padg
+    issuer: bi
+    title: "Perubahan Ketiga PADG QRIS (QRIS TUNTAS)"
+    number: "3/PADG/2025"
+    year: 2025
+    url: "https://www.bi.go.id/id/publikasi/peraturan/Documents/PADG_032025.pdf"
+    filename: "PADG_3_2025_QRIS_TUNTAS.pdf"
+    category: payment
+
+  # --- Banking & Consumer (supporting) ---
+  - id: pojk-17-2023
+    type: pojk
+    issuer: ojk
+    title: "Penerapan Tata Kelola Bagi Bank Umum"
+    number: "17/POJK.03/2023"
+    year: 2023
+    url: "https://www.ojk.go.id/id/regulasi/Documents/Pages/Penerapan-Tata-Kelola-Bagi-Bank-Umum/POJK%2017%20Tahun%202023.%20PENERAPAN%20TATA%20KELOLA%20BAGI%20BANK%20UMUM.pdf"
+    filename: "POJK_17_2023_Tata_Kelola_Bank_Umum.pdf"
+    category: banking
+
+  - id: pojk-22-2023
+    type: pojk
+    issuer: ojk
+    title: "Pelindungan Konsumen dan Masyarakat di Sektor Jasa Keuangan"
+    number: "22/POJK.07/2023"
+    year: 2023
+    url: "https://www.ojk.go.id/id/regulasi/Documents/Pages/Pelindungan-Konsumen-dan-Masyarakat-di-Sektor-Jasa-Keuangan/POJK%2022%20Tahun%202023%20Pelindungan%20Konsumen%20dan%20Masyarakat%20di%20Sektor%20Jasa%20Keuangan.pdf"
+    filename: "POJK_22_2023_Pelindungan_Konsumen.pdf"
+    category: banking
+
+  - id: pojk-12-2024
+    type: pojk
+    issuer: ojk
+    title: "Penerapan Strategi Anti Fraud bagi Lembaga Jasa Keuangan"
+    number: "12/POJK.01/2024"
+    year: 2024
+    url: "https://ojk.go.id/en/regulasi/Documents/Pages/12-Tahun-2024-Penerapan-Strategi-Anti-Fraud-bagi-Lembaga-Jasa-Keuangan/POJK%2012%20Tahun%202024%20Penerapan%20Strategi%20Anti%20Fraud%20bagi%20Lembaga%20Jasa%20Keuangan.pdf"
+    filename: "POJK_12_2024_Strategi_Anti_Fraud.pdf"
+    category: banking
+
+  - id: seojk-24-2023
+    type: seojk
+    issuer: ojk
+    title: "Penilaian Tingkat Maturitas Digital Bank Umum"
+    number: "24/SEOJK.03/2023"
+    year: 2023
+    url: "https://www.ojk.go.id/id/regulasi/Documents/Pages/Penilaian-Tingkat-Maturitas-Digital-Bank-Umum/SEOJK%2024-SEOJK.03-2023.%20Penilaian%20Tingkat%20Maturitas%20Digital%20Bank%20Umum.pdf"
+    filename: "SEOJK_24_2023_Maturitas_Digital_Bank_Umum.pdf"
+    category: ai
+
+  - id: uu-4-2023-p2sk
+    type: uu
+    issuer: government
+    title: "Undang-Undang Pengembangan dan Penguatan Sektor Keuangan (P2SK)"
+    number: "UU 4/2023"
+    year: 2023
+    url: "https://jdih.kemenkeu.go.id/api/download/58fac07c-7165-4c55-882d-965687f8090b/UU4TAHUN2023.pdf"
+    filename: "UU_4_2023_P2SK.pdf"
+    category: banking
