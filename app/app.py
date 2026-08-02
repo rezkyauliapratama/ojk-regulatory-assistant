@@ -340,7 +340,7 @@ def main() -> None:
                         namespace="rag_qa",
                         type_="chat",
                     )
-                    related = memory.recall(query)
+                    related = memory.recall(query, namespace="rag_qa")
                     if related:
                         st.markdown(f"**{tr('memory_related', lang)}**")
                         for r in related[:3]:
