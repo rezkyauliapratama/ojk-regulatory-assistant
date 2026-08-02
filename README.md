@@ -148,7 +148,9 @@ cd ojk-regulatory-assistant
 cp .env.example .env            # fill in: JINA_API_KEY, OPENAI_API_KEY, APP_PASSWORD
 
 # 2. Start infrastructure (Postgres + Grafana + Streamlit)
-docker compose up -d
+#    Grafana & Streamlit use custom Dockerfiles, so build is required
+#    (first run or after any change to grafana/ or Dockerfile):
+docker compose up -d --build
 
 # 3. Install Python deps (Python 3.11+)
 pip install -r requirements.txt
@@ -173,7 +175,9 @@ the app from your local Python:
 
 ```bash
 # 1. Start only Postgres + Grafana (infrastructure)
-docker compose up -d pgvector grafana
+#    Grafana has a custom Dockerfile (provisioning/dashboards baked in),
+#    so build it first:
+docker compose up -d --build pgvector grafana
 
 # 2. Local Python env
 python -m venv .venv && source .venv/bin/activate
