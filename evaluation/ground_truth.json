@@ -1,0 +1,242 @@
+[
+  {
+    "question": "Apa yang dimaksud dengan Machine Learning dalam definisi jenis kecerdasan artifisial pada dokumen ini?",
+    "answer": "Machine Learning (ML) dijelaskan sebagai bagian dari AI yang berfokus pada pengembangan model dan algoritma yang memungkinkan komputer belajar dan menemukan solusi secara mandiri. Dalam konteks ini, ML diposisikan sebagai salah satu cabang utama AI dengan fungsi dan aplikasi yang unik.",
+    "doc_id": "OJK_AI_Governance_Banking_2025",
+    "chunk_ids": [
+      "OJK_AI_Governance_Banking_2025-0"
+    ]
+  },
+  {
+    "question": "Dalam PADG ini, bagaimana Bank Indonesia menetapkan kurs acuan non-USD/IDR setiap hari kerja, dan sumber apa yang dipakai untuk menghitungnya?",
+    "answer": "Bank Indonesia menetapkan kurs acuan non-USD/IDR pada setiap hari kerja. Penetapannya didasarkan pada Jakarta Interbank Spot Dollar Rate serta kurs penutupan valuta asing terhadap valuta asing lainnya yang dikeluarkan oleh lembaga tertentu, lalu hasil perhitungannya dibulatkan ke rupiah terdekat.",
+    "doc_id": "PADG_24_2022_Pasar_Valuta_Asing",
+    "chunk_ids": [
+      "PADG_24_2022_Pasar_Valuta_Asing-34"
+    ]
+  },
+  {
+    "question": "Dalam PADG ini, apa saja yang wajib diterapkan PSP dan Peserta saat menyelenggarakan Sistem Pembayaran, dan apa yang harus dipertimbangkan dalam penerapannya?",
+    "answer": "PSP dan Peserta wajib menerapkan prinsip tata kelola yang baik dan manajemen risiko dalam penyelenggaraan Sistem Pembayaran. Penerapannya harus mempertimbangkan tujuan dan jenis aktivitas yang diselenggarakan, ukuran dan kompleksitas usaha, serta aspek TIKMI.",
+    "doc_id": "PADG_32_2025_Industri_Sistem_Pembayaran",
+    "chunk_ids": [
+      "PADG_32_2025_Industri_Sistem_Pembayaran-188"
+    ]
+  },
+  {
+    "question": "Dalam chunk ini, ke mana permohonan persetujuan kerja sama harus dikirim dan apa alamat lengkapnya?",
+    "answer": "Permohonan persetujuan kerja sama sebagaimana disebutkan dalam bagian ini disampaikan kepada satuan kerja yang melaksanakan fungsi kebijakan sistem pembayaran. Alamatnya adalah Departemen Kebijakan Sistem Pembayaran, Bank Indonesia, Gedung D Lantai 6, Jalan M.H. Thamrin Nomor 2, Jakarta 10350.",
+    "doc_id": "PADG_3_2025_QRIS_TUNTAS",
+    "chunk_ids": [
+      "PADG_3_2025_QRIS_TUNTAS-8"
+    ]
+  },
+  {
+    "question": "Dalam penyusunan Rencana Pemulihan Bencana, apa saja yang termasuk dalam risk assessment dan apa tujuan tahap ini?",
+    "answer": "Risk assessment adalah tahap identifikasi dan pengukuran risiko untuk mengetahui kemungkinan terjadinya gangguan pada kegiatan Bank yang penting serta dampaknya bagi kelangsungan usaha Bank. Paling sedikit, risk assessment mencakup analisis dampak gangguan atau bencana terhadap Bank, nasabah, dan industri keuangan, analisis kesenjangan (gap analysis) antara kondisi saat ini dan skenario yang seharusnya diterapkan, serta penyusunan peringkat risiko.",
+    "doc_id": "PADK_1_2026_Teknologi_Informasi_Bank_Umum",
+    "chunk_ids": [
+      "PADK_1_2026_Teknologi_Informasi_Bank_Umum-56"
+    ]
+  },
+  {
+    "question": "Apa sanksi yang dikenakan jika melanggar ketentuan pada Pasal 110, 111, 113, 114, 115, 116, 117, 118, 119, dan 122 dalam peraturan ini?",
+    "answer": "Chunk ini hanya memuat daftar pasal yang pelanggarannya dikenai sanksi pada Pasal 134, tetapi belum memuat jenis sanksinya. Jadi, dari potongan ini yang bisa dipastikan hanya bahwa pelanggaran terhadap pasal-pasal tersebut masuk dalam ketentuan sanksi Pasal 134.",
+    "doc_id": "PBI_10_2025_Industri_Sistem_Pembayaran",
+    "chunk_ids": [
+      "PBI_10_2025_Industri_Sistem_Pembayaran-149"
+    ]
+  },
+  {
+    "question": "Dalam PBI ini, apa yang dimaksud dengan Transaksi Spot, dan kapan penyerahan dananya dilakukan?",
+    "answer": "Transaksi Spot adalah transaksi jual atau beli valuta asing terhadap rupiah di pasar valuta asing yang bersifat tunai. Penyerahan dananya dilakukan 2 hari kerja setelah tanggal transaksi.",
+    "doc_id": "PBI_24_2022_Pasar_Valuta_Asing",
+    "chunk_ids": [
+      "PBI_24_2022_Pasar_Valuta_Asing-0"
+    ]
+  },
+  {
+    "question": "Dalam POJK ini, apa yang dimaksud dengan Bank Umum, Teknologi Informasi, dan Sistem Elektronik?",
+    "answer": "Bank Umum adalah bank yang menjalankan usaha konvensional atau syariah dan memberikan jasa dalam lalu lintas pembayaran, termasuk kantor cabang bank luar negeri dan unit usaha syariah. Teknologi Informasi adalah teknik untuk mengumpulkan, menyiapkan, menyimpan, memproses, mengumumkan, menganalisis, dan/atau menyebarkan informasi, sedangkan Sistem Elektronik adalah serangkaian perangkat dan prosedur elektronik untuk mempersiapkan, mengumpulkan, mengolah, menganalisis, menyimpan, menampilkan, dan mengumumkan informasi.",
+    "doc_id": "POJK_11_2022_Teknologi_Informasi_Bank_Umum",
+    "chunk_ids": [
+      "POJK_11_2022_Teknologi_Informasi_Bank_Umum-0"
+    ]
+  },
+  {
+    "question": "Dalam POJK ini, apa yang dimaksud dengan Lembaga Jasa Keuangan (LJK) dan Lembaga Jasa Keuangan Lainnya?",
+    "answer": "LJK adalah lembaga yang melaksanakan kegiatan di sektor perbankan, pasar modal, perasuransian, dana pensiun, modal ventura, lembaga keuangan mikro, lembaga pembiayaan, dan lembaga jasa keuangan lainnya. Lembaga Jasa Keuangan Lainnya mencakup pergadaian, lembaga penjaminan, LPEI, perusahaan pembiayaan sekunder perumahan, penyelenggara layanan pendanaan bersama berbasis teknologi informasi, serta lembaga pengelola dana masyarakat yang bersifat wajib seperti program jaminan sosial, pensiun, dan kesejahteraan.",
+    "doc_id": "POJK_12_2024_Strategi_Anti_Fraud",
+    "chunk_ids": [
+      "POJK_12_2024_Strategi_Anti_Fraud-0"
+    ]
+  },
+  {
+    "question": "Di Pasal 104 ini, kewajiban apa yang harus dilakukan Bank dan apa tanggung jawab pemegang saham pengendali terkait permasalahan keuangan Bank?",
+    "answer": "Bank wajib melaksanakan rencana penanganan permasalahan keuangan dan/atau penguatan modal yang dicantumkan dalam rencana bisnis. Bank juga harus menginformasikan rencana tersebut kepada pemegang saham pengendali, sedangkan pemegang saham pengendali wajib bertanggung jawab dan mendukung penguatan, penanganan, dan/atau penyelesaian permasalahan keuangan Bank serta menjaga keberlangsungan usaha Bank.",
+    "doc_id": "POJK_17_2023_Tata_Kelola_Bank_Umum",
+    "chunk_ids": [
+      "POJK_17_2023_Tata_Kelola_Bank_Umum-121"
+    ]
+  },
+  {
+    "question": "Di Pasal 112, OJK bisa berkoordinasi dengan siapa saja terkait penerapan pelindungan konsumen dan masyarakat di sektor jasa keuangan?",
+    "answer": "OJK dapat berkoordinasi dengan Pemerintah dan Bank Indonesia terkait penerapan pelindungan konsumen dan masyarakat di sektor jasa keuangan. Ketentuan ini berada di bagian akhir sebelum masuk ke BAB X tentang pengenaan sanksi dan pengajuan keberatan.",
+    "doc_id": "POJK_22_2023_Pelindungan_Konsumen",
+    "chunk_ids": [
+      "POJK_22_2023_Pelindungan_Konsumen-137"
+    ]
+  },
+  {
+    "question": "Dalam POJK ini, apa yang dimaksud dengan ITSK, Penyelenggara ITSK, Konsumen, dan Tata Kelola yang Baik?",
+    "answer": "ITSK adalah inovasi berbasis teknologi yang berdampak pada produk, aktivitas, layanan, dan model bisnis dalam ekosistem keuangan digital. Penyelenggara ITSK adalah pihak yang menyelenggarakan ITSK dan memiliki izin usaha dari OJK, sedangkan Konsumen adalah orang yang memiliki dan/atau memanfaatkan produk atau layanan pelaku usaha jasa keuangan. Tata Kelola yang Baik adalah struktur dan proses yang digunakan Penyelenggara ITSK untuk meningkatkan pencapaian sasaran hasil usaha.",
+    "doc_id": "POJK_30_2025_Tata_Kelola_ITSK",
+    "chunk_ids": [
+      "POJK_30_2025_Tata_Kelola_ITSK-0"
+    ]
+  },
+  {
+    "question": "Dalam Surat Edaran ini, apa yang dimaksud dengan cakupan tertentu pada proses evaluasi TI, dan apa yang harus dilakukan Bank atas hasil evaluasinya terhadap adopsi TI?",
+    "answer": "Cakupan tertentu mencakup antara lain performance testing, backtesting, dan benchmarking. Bank juga harus mengidentifikasi pelajaran terpetik dari adopsi TI serta merekomendasikan tindak lanjut atas hasil evaluasi.",
+    "doc_id": "SEOJK_24_2023_Maturitas_Digital_Bank_Umum",
+    "chunk_ids": [
+      "SEOJK_24_2023_Maturitas_Digital_Bank_Umum-27"
+    ]
+  },
+  {
+    "question": "Dalam ketentuan keamanan siber ini, langkah pengendalian teknis apa saja yang disebutkan terkait hardening, perlindungan web, NAT, IDS/IPS, dan antivirus/anti-malware?",
+    "answer": "Chunk ini menyebut beberapa pengendalian teknis, yaitu penggunaan standar hardening configuration template, perlindungan aplikasi web dengan WAF pada semua perangkat komputasi, perlindungan alamat IP internal dengan NAT, serta penggunaan IDS dan IPS. Selain itu, antivirus dan anti-malware juga harus dikelola secara terpusat dan selalu diperbarui pada perangkat endpoint.",
+    "doc_id": "SEOJK_29_2022_Keamanan_Siber_Bank_Umum",
+    "chunk_ids": [
+      "SEOJK_29_2022_Keamanan_Siber_Bank_Umum-35"
+    ]
+  },
+  {
+    "question": "Kalau ada orang yang menjalankan Program Pensiun tanpa pengesahan sebagai Dana Pensiun dari OJK, apa sanksi pidananya menurut pasal ini?",
+    "answer": "Setiap orang yang menjalankan Program Pensiun tanpa memperoleh pengesahan sebagai Dana Pensiun dari OJK dipidana penjara paling singkat 3 tahun dan paling lama 5 tahun. Selain itu, dikenakan pidana denda paling sedikit Rp10 miliar dan paling banyak Rp100 miliar.",
+    "doc_id": "UU_4_2023_P2SK",
+    "chunk_ids": [
+      "UU_4_2023_P2SK-669"
+    ]
+  },
+  {
+    "question": "Apa perbedaan utama antara GenAI, Predictive AI, dan Agentic AI yang dijelaskan pada bagian ini?",
+    "answer": "GenAI digunakan untuk membuat konten baru dari input tidak terstruktur seperti teks, gambar, atau audio, dan mampu menghasilkan percakapan layaknya manusia. Predictive AI berfokus pada memproyeksikan hasil atau kejadian masa depan dari data historis untuk membantu keputusan berbasis data, sedangkan Agentic AI digambarkan sebagai gelombang ketiga AI yang memperkenalkan sistem yang mampu membuat keputusan.",
+    "doc_id": "OJK_AI_Governance_Banking_2025",
+    "chunk_ids": [
+      "OJK_AI_Governance_Banking_2025-1"
+    ]
+  },
+  {
+    "question": "Dalam Pasal 2, transaksi apa saja yang termasuk dalam Pasar Valuta Asing?",
+    "answer": "Pasal 2 menyebutkan bahwa transaksi di Pasar Valuta Asing meliputi dua jenis, yaitu transaksi valuta asing terhadap rupiah dan transaksi valuta asing terhadap valuta asing. Dengan demikian, cakupannya tidak hanya terhadap rupiah, tetapi juga antarvaluta asing.",
+    "doc_id": "PADG_24_2022_Pasar_Valuta_Asing",
+    "chunk_ids": [
+      "PADG_24_2022_Pasar_Valuta_Asing-1"
+    ]
+  },
+  {
+    "question": "Dalam PADG ini, apa yang dimaksud dengan Pengguna Jasa, Penyedia Barang dan/atau Jasa, SRO di bidang sistem pembayaran, dan Sumber Dana untuk Pembayaran?",
+    "answer": "Pengguna Jasa adalah pihak yang menggunakan produk dan/atau jasa dari PSP. Penyedia Barang dan/atau Jasa adalah pihak yang menjual barang dan/atau jasa kepada Pengguna Jasa dan menerima pembayaran dari transaksi penjualan tersebut. SRO di bidang sistem pembayaran adalah forum atau institusi berbadan hukum Indonesia yang mewakili industri sistem pembayaran dan ditetapkan oleh Bank Indonesia, sedangkan Sumber Dana adalah sumber dana yang digunakan untuk memenuhi kewajiban dalam transaksi pembayaran dan ditatausahakan dalam suatu akun.",
+    "doc_id": "PADG_32_2025_Industri_Sistem_Pembayaran",
+    "chunk_ids": [
+      "PADG_32_2025_Industri_Sistem_Pembayaran-1"
+    ]
+  },
+  {
+    "question": "Dalam ketentuan ini, apa yang dimaksud dengan NMR dan siapa yang disebut Pedagang (Merchant) QRIS serta Pengguna QRIS?",
+    "answer": "NMR adalah sistem yang memiliki kemampuan menatausahakan data pedagang (merchant). Pedagang (Merchant) QRIS adalah penyedia barang dan/atau jasa yang tercatat dalam NMR untuk menerima Transaksi QRIS, sedangkan Pengguna QRIS adalah pihak yang melakukan pembayaran dalam Transaksi QRIS.",
+    "doc_id": "PADG_3_2025_QRIS_TUNTAS",
+    "chunk_ids": [
+      "PADG_3_2025_QRIS_TUNTAS-1"
+    ]
+  },
+  {
+    "question": "Pasal-pasal apa saja yang disebutkan dalam cuplikan ini?",
+    "answer": "Cuplikan ini hanya menyebutkan daftar pasal, yaitu Pasal 34, Pasal 38, Pasal 39, Pasal 43, Pasal 47, dan Pasal 52. Tidak ada penjelasan isi pasal pada potongan teks ini.",
+    "doc_id": "PADK_1_2026_Teknologi_Informasi_Bank_Umum",
+    "chunk_ids": [
+      "PADK_1_2026_Teknologi_Informasi_Bank_Umum-1"
+    ]
+  },
+  {
+    "question": "Dalam definisi ini, siapa yang dimaksud dengan Pengguna Jasa Sistem Pembayaran, Penyedia Barang dan/atau Jasa, SRO, dan Sumber Dana untuk Pembayaran?",
+    "answer": "Pengguna Jasa adalah pihak yang menggunakan produk dan/atau jasa dari PSP. Penyedia Barang dan/atau Jasa adalah pihak yang menjual barang dan/atau jasa kepada Pengguna Jasa dan menerima pembayaran dari transaksi tersebut. SRO adalah forum atau institusi berbadan hukum Indonesia yang mewakili industri Sistem Pembayaran dan ditetapkan oleh Bank Indonesia, sedangkan Sumber Dana adalah sumber dana yang digunakan untuk memenuhi kewajiban dalam transaksi pembayaran dan ditatausahakan dalam suatu akun untuk pembayaran.",
+    "doc_id": "PBI_10_2025_Industri_Sistem_Pembayaran",
+    "chunk_ids": [
+      "PBI_10_2025_Industri_Sistem_Pembayaran-1"
+    ]
+  },
+  {
+    "question": "Transaksi Swap Lindung Nilai Syariah kepada Bank Indonesia itu diselenggarakan untuk tujuan apa?",
+    "answer": "Transaksi ini diselenggarakan sebagai instrumen lindung nilai untuk menjaga stabilitas nilai tukar rupiah. Selain itu, tujuannya juga untuk mengelola risiko nilai tukar dan mendorong pendalaman pasar keuangan syariah.",
+    "doc_id": "PBI_24_2022_Pasar_Valuta_Asing",
+    "chunk_ids": [
+      "PBI_24_2022_Pasar_Valuta_Asing-1"
+    ]
+  },
+  {
+    "question": "Siapa yang dimaksud sebagai pihak yang ditunjuk untuk melaksanakan fungsi pengawasan bagi kantor cabang dari bank yang berkedudukan di luar negeri dalam ketentuan ini?",
+    "answer": "Yang dimaksud adalah perseroan terbatas, atau pihak yang ditunjuk untuk melaksanakan fungsi pengawasan bagi kantor cabang dari bank yang berkedudukan di luar negeri. Potongan ini juga menunjukkan bahwa ketentuan tersebut berada pada Bab II tentang Tata Kelola TI Bank.",
+    "doc_id": "POJK_11_2022_Teknologi_Informasi_Bank_Umum",
+    "chunk_ids": [
+      "POJK_11_2022_Teknologi_Informasi_Bank_Umum-1"
+    ]
+  },
+  {
+    "question": "Dalam ketentuan ini, apa yang dimaksud dengan Dewan Komisaris pada LJK?",
+    "answer": "Dewan Komisaris adalah organ LJK yang bertugas melakukan pengawasan secara umum dan/atau khusus serta memberi nasihat kepada Direksi sesuai anggaran dasar. Untuk LJK berbentuk badan hukum tertentu, kedudukannya dapat setara dengan Direksi sebagaimana diatur dalam ketentuan tersebut.",
+    "doc_id": "POJK_12_2024_Strategi_Anti_Fraud",
+    "chunk_ids": [
+      "POJK_12_2024_Strategi_Anti_Fraud-1"
+    ]
+  },
+  {
+    "question": "Dalam Pasal 2 ayat (4), penerapan tata kelola bank paling sedikit diwujudkan dalam aspek apa saja yang disebutkan di bagian itu?",
+    "answer": "Pasal 2 ayat (4) menyebutkan bahwa penerapan tata kelola bank paling sedikit diwujudkan dalam beberapa aspek, antara lain pelaksanaan tugas, tanggung jawab, dan wewenang Direksi dan Dewan Komisaris, kelengkapan dan pelaksanaan tugas komite, penanganan benturan kepentingan, fungsi kepatuhan, audit intern dan ekstern, serta manajemen risiko termasuk sistem pengendalian intern.",
+    "doc_id": "POJK_17_2023_Tata_Kelola_Bank_Umum",
+    "chunk_ids": [
+      "POJK_17_2023_Tata_Kelola_Bank_Umum-1"
+    ]
+  },
+  {
+    "question": "Dalam POJK ini, apa yang dimaksud dengan Sengketa dan siapa yang dimaksud dengan LAPS Sektor Jasa Keuangan?",
+    "answer": "Sengketa adalah perselisihan antara Konsumen dengan PUJK yang telah melalui proses penyelesaian Pengaduan oleh PUJK. LAPS Sektor Jasa Keuangan adalah lembaga yang melakukan penyelesaian Sengketa antara Konsumen dan PUJK di luar pengadilan.",
+    "doc_id": "POJK_22_2023_Pelindungan_Konsumen",
+    "chunk_ids": [
+      "POJK_22_2023_Pelindungan_Konsumen-1"
+    ]
+  },
+  {
+    "question": "Dalam dokumen ini, apa yang dimaksud dengan benturan kepentingan dan risiko?",
+    "answer": "Benturan kepentingan adalah keadaan ketika ada konflik antara kepentingan Penyelenggara ITSK dan kepentingan pribadi, keluarga, atau kelompok pemegang saham dari anggota Direksi, Dewan Komisaris, maupun pegawai. Risiko didefinisikan sebagai potensi kerugian yang bisa tidak dapat dikendalikan dan/atau dapat dikendalikan akibat terjadinya suatu peristiwa tertentu.",
+    "doc_id": "POJK_30_2025_Tata_Kelola_ITSK",
+    "chunk_ids": [
+      "POJK_30_2025_Tata_Kelola_ITSK-1"
+    ]
+  },
+  {
+    "question": "Apa latar belakang penerbitan SEOJK ini terkait transformasi digital bank umum?",
+    "answer": "Perkembangan TI telah mengubah proses bisnis dan model layanan bank, sementara perilaku masyarakat juga semakin digital sehingga bank perlu melakukan transformasi digital. Kebutuhan layanan digital yang lengkap dan aman membuat bank sangat bergantung pada TI dalam operasionalnya, dan manfaat maksimal hanya tercapai jika adopsi TI selaras dengan kebutuhan proses bisnis bank.",
+    "doc_id": "SEOJK_24_2023_Maturitas_Digital_Bank_Umum",
+    "chunk_ids": [
+      "SEOJK_24_2023_Maturitas_Digital_Bank_Umum-1"
+    ]
+  },
+  {
+    "question": "Apa yang dimaksud dengan notifikasi awal insiden siber dalam penyelenggaraan TI yang terkait keamanan siber?",
+    "answer": "Notifikasi awal insiden siber adalah pemberitahuan segera atas kejadian kritis, penyalahgunaan, dan/atau kejahatan dalam penyelenggaraan TI yang terkait dengan keamanan siber.",
+    "doc_id": "SEOJK_29_2022_Keamanan_Siber_Bank_Umum",
+    "chunk_ids": [
+      "SEOJK_29_2022_Keamanan_Siber_Bank_Umum-1"
+    ]
+  },
+  {
+    "question": "Dalam bagian ini, undang-undang apa saja yang disebutkan sebagai dasar perubahan atau rujukan, dan bagaimana status perubahannya?",
+    "answer": "Chunk ini menyebut Undang-Undang Nomor 24 Tahun 2004 tentang Lembaga Penjamin Simpanan yang telah diubah dengan Undang-Undang Nomor 7 Tahun 2009. Selain itu, disebut juga Undang-Undang Nomor 40 Tahun 2004 tentang Sistem Jaminan Sosial Nasional yang telah diubah, tetapi teks perubahannya belum selesai pada potongan ini.",
+    "doc_id": "UU_4_2023_P2SK",
+    "chunk_ids": [
+      "UU_4_2023_P2SK-1"
+    ]
+  }
+]

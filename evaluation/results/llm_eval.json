@@ -1,0 +1,25 @@
+{
+  "results": {
+    "v1": {
+      "mean": {
+        "relevance": 4.6,
+        "groundedness": 2.8,
+        "completeness": 3.1,
+        "citations": 3.0,
+        "overall": 3.38
+      },
+      "n": 10
+    },
+    "v2": {
+      "mean": {
+        "relevance": 4.6,
+        "groundedness": 3.0,
+        "completeness": 3.4,
+        "citations": 2.6,
+        "overall": 3.4
+      },
+      "n": 10
+    }
+  },
+  "details": []
+}

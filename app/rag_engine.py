@@ -13,6 +13,7 @@ Run standalone (CLI demo):
 import json
 import os
 import pathlib
+import re
 import sys
 from typing import Any
 
@@ -36,6 +37,23 @@ LLM_MODEL = os.environ.get("LLM_MODEL", "gpt-5.4-mini")
 
 # RRF fusion constant
 RRF_K = 60
+
+STOPWORDS_ID = {
+    "apa", "yang", "untuk", "dengan", "bagaimana", "dalam", "pada", "dari",
+    "ke", "di", "dan", "atau", "adalah", "itu", "ini", "tersebut", "wajib",
+    "bank", "umum", "ketentuan", "mengenai", "tentang", "apakah", "saja",
+    "dokumen", "pasal", "dengan", "suatu", "sebuah", "para", "oleh", "akan",
+    "tidak", "juga", "saat", "lebih", "paling", "harus", "bisa", "dapat",
+}
+
+
+def fts_query(query: str) -> str:
+    """Build an OR-semantics tsquery from query keywords (stopwords removed)."""
+    words = [w.lower() for w in re.findall(r"[a-z0-9]+", query.lower())
+             if w not in STOPWORDS_ID and len(w) > 3]
+    if not words:
+        return query
+    return " | ".join(words)
 
 
 # ---------------------------------------------------------------- embedding
@@ -119,16 +137,17 @@ class HybridSearch:
         return [(r[0], r[1]) for r in rows]
 
     def _fts(self, query: str, k: int) -> list[tuple[str, float]]:
+        tq = fts_query(query)
         cur = self.conn.cursor()
         cur.execute(
             """
-            SELECT chunk_id, ts_rank(text_tsv, plainto_tsquery('simple', %s)) AS score
+            SELECT chunk_id, ts_rank(text_tsv, to_tsquery('simple', %s)) AS score
             FROM ojk.regulation_chunks
-            WHERE text_tsv @@ plainto_tsquery('simple', %s)
+            WHERE text_tsv @@ to_tsquery('simple', %s)
             ORDER BY score DESC
             LIMIT %s
             """,
-            (query, query, k),
+            (tq, tq, k),
         )
         rows = cur.fetchall()
         cur.close()
