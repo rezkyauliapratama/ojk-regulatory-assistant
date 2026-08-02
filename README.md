@@ -247,6 +247,25 @@ open http://localhost:8501
 # log in with APP_PASSWORD from .env
 ```
 
+### Sample questions to try
+
+10 ready-to-use questions (English + Bahasa Indonesia) with the
+regulations they target. Full list with tips: see
+[`docs/sample-questions.md`](docs/sample-questions.md).
+
+| # | English | Bahasa Indonesia | Regulation(s) covered |
+|---|---------|------------------|-----------------------|
+| 1 | What is QRIS and who can be a QRIS payment service provider? | Apa itu QRIS dan siapa saja yang dapat menjadi penyelenggara jasa pembayaran QRIS? | PADG 3/2025, PADG 32/2025 |
+| 2 | What are the key requirements for AI governance in Indonesian banks? | Apa saja persyaratan utama tata kelola AI di perbankan Indonesia? | OJK AI Governance 2025 |
+| 3 | What cybersecurity obligations do banks have under SEOJK 29/2022? | Apa saja kewajiban keamanan siber bank berdasarkan SEOJK 29/2022? | SEOJK 29/2022 |
+| 4 | How must banks handle customer complaints under POJK 22/2023? | Bagaimana bank harus menangani pengaduan nasabah berdasarkan POJK 22/2023? | POJK 22/2023 |
+| 5 | What is the minimum IT risk management framework a bank needs? | Apa saja komponen minimum kerangka manajemen risiko TI yang wajib dimiliki bank? | POJK 11/2022, PADK 1/2026 |
+| 6 | What anti-fraud strategies does POJK 12/2024 require? | Strategi anti-fraud apa yang diwajibkan oleh POJK 12/2024? | POJK 12/2024 |
+| 7 | What is BI-FAST and how does it affect payment services? | Apa itu BI-FAST dan bagaimana pengaruhnya terhadap layanan pembayaran? | PBI 10/2025 |
+| 8 | What are the digital maturity levels in SEOJK 24/2023? | Apa saja tingkat kematangan digital dalam SEOJK 24/2023? | SEOJK 24/2023 |
+| 9 | What does the P2SK law (UU 4/2023) change for financial sector supervision? | Apa yang diubah UU 4/2023 (P2SK) terhadap pengawasan sektor keuangan? | UU 4/2023 |
+| 10 | What are the requirements for banks using fintech innovation (ITSK) under POJK 30/2025? | Apa saja persyaratan bank dalam menggunakan inovasi teknologi sektor keuangan (ITSK) berdasarkan POJK 30/2025? | POJK 30/2025 |
+
 ### Run from local (dev mode, no Streamlit container)
 
 If you prefer running the app directly on your machine (not in a
@@ -349,6 +368,8 @@ python scripts/verify.py         # smoke test
 │   └── results/
 │       ├── retrieval_eval.json  # HitRate@5 / MRR@5 per strategy
 │       └── llm_eval.json        # judge scores per prompt version
+├── docs/
+│   └── sample-questions.md # 10 bilingual sample questions + tips
 ├── grafana/
 │   ├── Dockerfile              # custom image with provisioning baked in
 │   ├── provisioning/           # datasource + dashboard provider
