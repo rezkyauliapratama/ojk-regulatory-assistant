@@ -72,6 +72,9 @@ T = {
         "memory_related": "🧠 Related past conversations:",
         "memory_empty": "No related past conversations found yet — start chatting and past Q&A will be recalled here.",
         "memory_stored": "Q&A stored to memory.",
+        "saved_questions": "💬 Saved questions",
+        "saved_questions_empty": "No saved questions yet. Ask something with memory enabled and it will appear here — click to re-ask.",
+        "ask_again": "Ask again",
     },
     "id": {
         "page_title": "Asisten Intelijen Regulasi",
@@ -115,6 +118,9 @@ T = {
         "memory_related": "🧠 Percakapan terkait sebelumnya:",
         "memory_empty": "Belum ada percakapan terkait — mulai ngobrol dan Q&A sebelumnya akan muncul di sini.",
         "memory_stored": "Q&A tersimpan ke memori.",
+        "saved_questions": "💬 Pertanyaan tersimpan",
+        "saved_questions_empty": "Belum ada pertanyaan tersimpan. Tanya sesuatu dengan memori aktif dan pertanyaan akan muncul di sini — klik untuk tanya lagi.",
+        "ask_again": "Tanya lagi",
     },
 }
 
@@ -292,6 +298,16 @@ def main() -> None:
         if use_memory:
             if memory.available:
                 st.success(f"🧠 {tr('memory_available', lang)}")
+                # saved questions: click to re-ask
+                saved = memory.recent_questions()
+                if saved:
+                    with st.expander(f"{tr('saved_questions', lang)} ({len(saved)})"):
+                        for q in saved:
+                            if st.button(f"🔁 {q}", key=f"saved_{q}", help=tr("ask_again", lang)):
+                                st.session_state.preset_query = q
+                                st.rerun()
+                else:
+                    st.caption(tr("saved_questions_empty", lang))
             elif memory.error:
                 st.warning(f"🧠 {tr('memory_missing', lang, path=memory.binary)}\n\n{memory.error}")
             else:
@@ -318,6 +334,10 @@ def main() -> None:
 
     # query input
     query = st.chat_input(tr("chat_placeholder", lang))
+
+    # a saved-question button was clicked in the sidebar -> use it
+    if not query and st.session_state.get("preset_query"):
+        query = st.session_state.pop("preset_query")
 
     if query:
         st.session_state.messages.append({"role": "user", "content": query})

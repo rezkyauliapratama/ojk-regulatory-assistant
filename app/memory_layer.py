@@ -128,3 +128,19 @@ class MemoryLayer:
                 continue
             normalized.append({k.lower(): v for k, v in item.items()})
         return normalized
+
+    def recent_questions(self, namespace: str = "rag_qa", limit: int = 20) -> list[str]:
+        """Return stored question strings (most recent first, best-effort).
+
+        Nyawa has no 'list all' MCP tool, so we recall with a generic
+        query that matches everything, then parse the 'Q: <question>'
+        prefix that app.py stores. Returns [] on any failure.
+        """
+        results = self.recall("conversation history Q&A", namespace=namespace, limit=limit)
+        questions = []
+        for r in results:
+            content = r.get("content", "") or ""
+            first_line = content.split("\n", 1)[0]
+            if first_line.startswith("Q: "):
+                questions.append(first_line[3:].strip())
+        return questions
