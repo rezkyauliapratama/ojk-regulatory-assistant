@@ -46,7 +46,10 @@ services:
     env_file:
       - .env
     environment:
+      # In-container networking: 'localhost' in .env refers to the container
+      # itself, so override DATABASE_URL with the pgvector service hostname.
       POSTGRES_HOST: pgvector
+      DATABASE_URL: postgresql://${POSTGRES_USER:-rag}:${POSTGRES_PASSWORD:-change_me}@pgvector:5432/${POSTGRES_DB:-rag_db}
     volumes:
       - ./data:/app/data
     depends_on:

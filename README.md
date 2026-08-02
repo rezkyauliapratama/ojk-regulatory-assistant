@@ -208,9 +208,14 @@ streamlit run app/app.py --server.port 8501
 ```
 
 The app connects to Postgres via `DATABASE_URL` in `.env` (default:
-`postgresql://rag:change_me@localhost:5432/rag_db`). If your
-Postgres runs in Docker, use host `172.17.0.1` (Docker gateway) instead
-of `localhost` — see `DATABASE_URL` in `.env`.
+`postgresql://rag:***@localhost:5432/rag_db`).
+
+- **Streamlit in Docker** (`docker compose up -d --build`): compose
+  overrides `DATABASE_URL` with host `pgvector` (the service name), so
+  `localhost` in `.env` is ignored — nothing to change.
+- **Local dev mode**: use host `localhost`. If your Postgres runs in
+  Docker on a remote VM, use host `172.17.0.1` (Docker gateway)
+  instead — see `DATABASE_URL` in `.env`.
 
 ### Ports
 
