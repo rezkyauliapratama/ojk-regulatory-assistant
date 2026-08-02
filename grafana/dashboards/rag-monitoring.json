@@ -21,7 +21,7 @@
     {
       "id": 1,
       "type": "timeseries",
-      "title": "Pertanyaan per Hari",
+      "title": "Queries per Day",
       "datasource": { "type": "postgres", "uid": "PG" },
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
       "targets": [
@@ -43,7 +43,7 @@
     {
       "id": 2,
       "type": "stat",
-      "title": "Total Pertanyaan",
+      "title": "Total Queries",
       "datasource": { "type": "postgres", "uid": "PG" },
       "gridPos": { "h": 8, "w": 6, "x": 12, "y": 0 },
       "targets": [
@@ -63,7 +63,7 @@
     {
       "id": 3,
       "type": "barchart",
-      "title": "Feedback Pengguna (👍/👎)",
+      "title": "User Feedback (👍/👎)",
       "datasource": { "type": "postgres", "uid": "PG" },
       "gridPos": { "h": 8, "w": 6, "x": 18, "y": 0 },
       "targets": [
@@ -83,7 +83,7 @@
     {
       "id": 4,
       "type": "timeseries",
-      "title": "Token per Pertanyaan",
+      "title": "Tokens per Query",
       "datasource": { "type": "postgres", "uid": "PG" },
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
       "targets": [
@@ -123,7 +123,7 @@
     {
       "id": 6,
       "type": "barchart",
-      "title": "Dokumen Paling Banyak Dikutip",
+      "title": "Most Cited Documents",
       "datasource": { "type": "postgres", "uid": "PG" },
       "gridPos": { "h": 8, "w": 6, "x": 18, "y": 8 },
       "targets": [
@@ -183,14 +183,14 @@
     {
       "id": 9,
       "type": "stat",
-      "title": "Feedback Positif (%)",
+      "title": "Positive Feedback (%)",
       "datasource": { "type": "postgres", "uid": "PG" },
       "gridPos": { "h": 4, "w": 8, "x": 16, "y": 16 },
       "targets": [
         {
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT ROUND(100.0 * count(*) FILTER (WHERE feedback = 'up') / NULLIF(count(*), 0), 1) AS pct FROM regulatory.conversations WHERE feedback IS NOT NULL",
+          "rawSql": "SELECT COALESCE(ROUND(100.0 * count(*) FILTER (WHERE feedback = 'up') / NULLIF(count(*) FILTER (WHERE feedback IS NOT NULL), 0), 1), 0) AS pct FROM regulatory.conversations",
           "refId": "A",
           "datasource": { "type": "postgres", "uid": "PG" }
         }
@@ -210,7 +210,7 @@
         {
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT created_at, query, LEFT(answer, 300) AS answer_preview, prompt_version, model, usage_tokens, COALESCE(feedback, '-') AS feedback, (SELECT string_agg(doc_id, ', ') FROM jsonb_to_recordset(docs) AS r(doc_id text)) AS cited_docs FROM regulatory.conversations ORDER BY created_at DESC LIMIT 50",
+          "rawSql": "SELECT created_at, query, LEFT(answer, 300) AS answer_preview, prompt_version, model, usage_tokens, CASE feedback WHEN 'up' THEN '👍 up' WHEN 'down' THEN '👎 down' ELSE '—' END AS feedback, (SELECT string_agg(doc_id, ', ') FROM jsonb_to_recordset(docs) AS r(doc_id text)) AS cited_docs FROM regulatory.conversations ORDER BY created_at DESC LIMIT 50",
           "refId": "A",
           "datasource": { "type": "postgres", "uid": "PG" }
         }
