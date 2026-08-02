@@ -20,7 +20,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import streamlit as st
 import yaml
 
-from conversations import init_db, log_conversation, set_feedback
+from conversations import init_db, log_conversation, log_nyawa_recall, set_feedback
 from llm_flow import answer, translate_docs
 from memory_layer import MemoryLayer
 from rag_engine import RagEngine
@@ -344,6 +344,8 @@ def main() -> None:
                                 st.markdown(f"- {c[:300]}")
                     else:
                         st.caption(tr("memory_empty", lang))
+                    # log recall metrics to Postgres for Grafana (best-effort)
+                    log_nyawa_recall(query, related)
 
                 st.markdown(answer_text)
                 if docs:

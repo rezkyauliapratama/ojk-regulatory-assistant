@@ -234,6 +234,66 @@
           }
         ]
       }
+    },
+    {
+      "id": 11,
+      "type": "stat",
+      "title": "Nyawa Avg Relevance",
+      "datasource": { "type": "postgres", "uid": "PG" },
+      "gridPos": { "h": 4, "w": 8, "x": 0, "y": 32 },
+      "targets": [
+        {
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT COALESCE(ROUND(AVG(avg_score)::numeric, 3), 0) AS avg_rel FROM regulatory.nyawa_recalls",
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "PG" }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "percentunit", "decimals": 3 },
+        "overrides": []
+      }
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "Nyawa Recall Relevance over Time",
+      "datasource": { "type": "postgres", "uid": "PG" },
+      "gridPos": { "h": 8, "w": 16, "x": 8, "y": 32 },
+      "targets": [
+        {
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT created_at AS time, avg_score FROM regulatory.nyawa_recalls WHERE $__timeFilter(created_at) ORDER BY 1",
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "PG" }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "percentunit", "decimals": 3 },
+        "overrides": []
+      }
+    },
+    {
+      "id": 13,
+      "type": "barchart",
+      "title": "Nyawa Recall Results per Query",
+      "datasource": { "type": "postgres", "uid": "PG" },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 36 },
+      "targets": [
+        {
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT LEFT(query, 40) AS query, n_results, ROUND(avg_score::numeric, 3) AS avg_score FROM regulatory.nyawa_recalls ORDER BY created_at DESC LIMIT 10",
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "PG" }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "short" },
+        "overrides": []
+      }
     }
   ],
   "refresh": "5s",
