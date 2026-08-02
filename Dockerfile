@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY pyproject.toml README.md ./
 COPY app/ ./app/
 
-RUN pip install --no-cache-dir streamlit openai psycopg2-binary python-dotenv
+RUN pip install --no-cache-dir streamlit openai psycopg2-binary python-dotenv requests pyyaml
 
 EXPOSE 8501
 
