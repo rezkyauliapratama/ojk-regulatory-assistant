@@ -104,6 +104,7 @@ def main() -> None:
     with st.sidebar:
         st.header("⚙️ Pengaturan")
         version = st.radio("Prompt version", ["v1 (citasi ketat)", "v2 (terstruktur)"], index=0)
+        st.caption("v1 dipilih default — menang LLM-as-a-Judge (3.95 vs 3.69)")
         prompt_version = "v1" if version.startswith("v1") else "v2"
         use_memory = st.checkbox("Gunakan memori sesi (Nyawa)", value=False)
         if st.button("Logout"):
