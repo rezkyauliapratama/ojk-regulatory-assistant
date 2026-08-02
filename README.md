@@ -1,32 +1,32 @@
 # OJK Regulatory Intelligence Assistant
 
-**LLM Zoomcamp 2026 — Final Project**
+**LLM Zoomcamp 2026 - Final Project**
 
 A RAG-based Q&A assistant over Indonesian banking and payment regulations
-(OJK/BI). Ask questions in Bahasa Indonesia about AI governance, cyber
-security, payment systems (QRIS, BI-FAST), consumer protection, and more —
-the system retrieves relevant regulation passages and answers with citations.
+(OJK/BI). Ask questions about AI governance, cyber security, payment
+systems (QRIS, BI-FAST), consumer protection, and more. The system
+retrieves the relevant regulation passages and answers with citations.
 
-> **Disclaimer:** Personal learning project (LLM Zoomcamp 2026 Final Project).
-> Not affiliated with PT Bank Sinarmas Tbk or any financial institution. All
-> regulatory documents are public domain from ojk.go.id and bi.go.id
-> (Indonesian Copyright Law No. 28/2014, Article 42).
+> **Disclaimer:** Personal learning project (LLM Zoomcamp 2026 Final
+> Project). Not affiliated with PT Bank Sinarmas Tbk or any financial
+> institution. All regulatory documents are public domain from ojk.go.id
+> and bi.go.id (Indonesian Copyright Law No. 28/2014, Article 42).
 
 ---
 
 ## 1. Problem
 
-Indonesian banking and fintech professionals need fast, accurate answers from
-regulatory documents — POJK, SEOJK, PBI, PADG — which are long PDFs that are
-hard to search manually. Finding the right pasal (article) often means
-reading hundreds of pages.
+Indonesian banking and fintech professionals need fast, accurate answers
+from regulatory documents: POJK, SEOJK, PBI, PADG. These are long PDFs
+that are hard to search manually. Finding the right pasal (article) often
+means reading hundreds of pages.
 
 This project builds an end-to-end RAG assistant over a curated corpus of
 **15 regulations** focused on two hot topics:
 
-- **AI / technology governance** — AI governance for banks, IT risk
+- **AI / technology governance** - AI governance for banks, IT risk
   management, cyber security, digital maturity, consumer protection
-- **Payment systems** — QRIS, BI-FAST, payment service providers (PJP),
+- **Payment systems** - QRIS, BI-FAST, payment service providers (PJP),
   foreign exchange, P2SK financial sector law
 
 ## 2. Dataset
@@ -51,54 +51,45 @@ This project builds an end-to-end RAG assistant over a curated corpus of
 | 14 | PADG 24/2022 | Foreign exchange market |
 | 15 | UU 4/2023 | P2SK (financial sector law) |
 
-The PDFs are committed under `data/pdfs/` (public domain, so this is legal),
-making the project **fully reproducible without any download step**. The
-full manifest with source URLs is in `data/sources.yaml`.
+The PDFs are committed under `data/pdfs/` (public domain, so this is
+legal), making the project **fully reproducible without any download
+step**. The full manifest with source URLs is in `data/sources.yaml`.
 
 ## 3. Architecture
 
 ```
-┌─────────────┐     ┌──────────────────────────────────────────────┐
-│  Streamlit  │ ──► │                 RAG Engine                   │
-│  UI (8501)  │     │                                              │
-└─────────────┘     │  1. Query rewriting (LLM expands acronyms)   │
-                    │     KPMM → "Kewajiban Penyediaan Modal       │
-                    │            Minimum"                          │
-                    │  2. Hybrid retrieval:                        │
-                    │     • Dense: Jina embeddings → pgvector      │
-                    │       cosine (HNSW index)                    │
-                    │     • Lexical: Postgres FTS (tsvector,       │
-                    │       stopword-filtered OR semantics)        │
-                    │     • Fusion: Reciprocal Rank Fusion (RRF)   │
-                    │  3. Rerank: Jina cross-encoder (top-10→5)    │
-                    │  4. LLM: DeepSeek answers with citations     │
-                    └───────────────┬──────────────────────────────┘
-                                    │
-                    ┌───────────────▼──────────────────────────────┐
-                    │          PostgreSQL (pgvector)               │
-                    │  regulatory.regulation_chunks (3,670 chunks)   │
-                    │  regulatory.conversations (Q&A log + feedback) │
-                    └───────────────┬──────────────────────────────┘
-                                    │
-            ┌───────────────────────┴───────────────────────┐
-            ▼                                               ▼
-   ┌──────────────────┐                          ┌──────────────────┐
-   │  Grafana (3000)  │                          │  Nyawa (optional)│
-   │  Monitoring:     │                          │  memory engine   │
-   │  6 charts        │                          │  cross-session   │
-   └──────────────────┘                          │  context recall  │
-                                                 └──────────────────┘
+Streamlit UI (8501)
+  |
+  v
+RAG Engine
+  1. Query rewriting (LLM expands acronyms)
+     KPMM -> "Kewajiban Penyediaan Modal Minimum"
+  2. Hybrid retrieval
+     - Dense: Jina embeddings -> pgvector cosine (HNSW index)
+     - Lexical: Postgres FTS (tsvector, stopword-filtered OR)
+     - Fusion: Reciprocal Rank Fusion (RRF)
+  3. Rerank: Jina cross-encoder (top-10 -> top-5)
+  4. LLM: DeepSeek answers with citations
+  |
+  v
+PostgreSQL (pgvector)
+  - regulatory.regulation_chunks (3,670 chunks)
+  - regulatory.conversations (Q&A log + feedback)
+  - regulatory.nyawa_recalls (memory recall metrics)
+  |
+  +---> Grafana (3000): monitoring dashboard
+  +---> Nyawa (optional): cross-session memory engine
 ```
 
 ### Data flow (ingestion pipeline)
 
 ```
 data/pdfs/*.pdf
-  → extract_text.py   → data/extracted/*.txt      (raw text)
-  → chunk.py          → data/chunks/*.jsonl       (3,670 chunks, pasal-aware)
-  → embed.py          → data/embeddings/*.npy     (Jina API, 1024-dim)
-  → ingest.py         → PostgreSQL via dlt        (text + embedding_json)
-  → setup_vector.py   → vector(1024) cast + HNSW + FTS tsvector
+  -> extract_text.py -> data/extracted/*.txt      (raw text)
+  -> chunk.py        -> data/chunks/*.jsonl       (3,670 chunks, pasal-aware)
+  -> embed.py        -> data/embeddings/*.npy     (Jina API, 1024-dim)
+  -> ingest.py       -> PostgreSQL via dlt        (text + embedding_json)
+  -> setup_vector.py -> vector(1024) cast + HNSW + FTS tsvector
 ```
 
 ## 4. Tech Stack
@@ -111,11 +102,11 @@ data/pdfs/*.pdf
 | Embeddings | Jina AI `jina-embeddings-v3` (API, 1024-dim) | Multilingual, no local model |
 | Hybrid search | pgvector dense + Postgres FTS + RRF | Best-practice hybrid retrieval |
 | Reranker | Jina `jina-reranker-v2-base-multilingual` | Multilingual cross-encoder |
-| LLM | DeepSeek `deepseek-v4-flash` (OpenAI-compatible API) | Cheap, strong citations |
-| Monitoring | Grafana 11 | 6-chart dashboard from conversations |
+| LLM | DeepSeek `deepseek-v4-flash` (OpenAI-compatible) | Cheap, strong citations |
+| Monitoring | Grafana 11 | Dashboard from conversations table |
 | Memory (bonus) | Nyawa v1.0.0 (offline memory engine, MCP) | Cross-session Q&A context |
 
-All APIs are OpenAI-compatible — swap providers by editing `.env`:
+All APIs are OpenAI-compatible. Swap providers by editing `.env`:
 
 ```bash
 # Default (DeepSeek):
@@ -129,93 +120,163 @@ OPENAI_API_KEY=sk-or-...       # OpenRouter key
 LLM_MODEL=gpt-5.4-mini
 ```
 
-## 5. Quick Start
-
-### Prerequisites
+### Requirements
 
 | Requirement | Version / Notes |
 |-------------|-----------------|
 | Python | 3.11+ (tested on 3.13) |
-| Docker + Docker Compose | for Postgres + Grafana |
+| Docker + Docker Compose | for Postgres + Grafana + Streamlit |
 | Jina API key | https://jina.ai (free tier: 1M tokens/mo) |
 | DeepSeek API key | https://platform.deepseek.com (cheap, ~$0.02/M tokens) |
+| Go 1.23+ | only if you build Nyawa from source (local mode) |
 | RAM | ~2 GB for the app + Postgres (fine on a small VM) |
 
+## 5. Quick Start (fresh clone to running app)
+
+Semua command di bawah dijalankan dari folder project
+(`cd ojk-regulatory-assistant`). Ikuti urutannya: tiap step bergantung
+pada step sebelumnya.
+
+### Step 1: Clone & configure
+
 ```bash
-# 1. Clone & configure
 git clone https://github.com/rezkyauliapratama/ojk-regulatory-assistant.git
 cd ojk-regulatory-assistant
-cp .env.example .env            # fill in: JINA_API_KEY, OPENAI_API_KEY, APP_PASSWORD
 
-# 2. Start infrastructure (Postgres + Grafana + Streamlit)
-#    Grafana & Streamlit use custom Dockerfiles, so build is required
-#    (first run or after any change to grafana/ or Dockerfile):
-docker compose up -d --build
-
-# 3. Create venv & install Python deps (Python 3.11+)
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-
-# 4. Generate chunks & embeddings from the PDFs (one-time).
-#    data/extracted/, data/chunks/, data/embeddings/ are gitignored,
-#    so a fresh clone must build them first:
-python scripts/extract_text.py     # PDFs -> data/extracted/*.txt
-python scripts/chunk.py            # -> data/chunks/*.jsonl (section-based)
-python scripts/embed.py            # -> data/embeddings/*.npy (Jina API, needs JINA_API_KEY)
-
-# 5. Ingest regulations (loads 3,670 chunks into PGVector)
-python scripts/ingest.py           # dlt loads chunks into Postgres
-python scripts/setup_vector.py     # vector(1024) + HNSW + FTS indexes
-
-# 6. Verify retrieval works
-python scripts/verify.py
-
-# 7. Open the chat UI
-streamlit run app/app.py
-open http://localhost:8501       # login with APP_PASSWORD
+# buat .env dari template, lalu isi 3 key wajib:
+cp .env.example .env
+# - JINA_API_KEY   (https://jina.ai, gratis 1M token/bulan)
+# - OPENAI_API_KEY (DeepSeek: https://platform.deepseek.com)
+# - APP_PASSWORD   (password login UI, bebas)
 ```
 
-### Run from local (dev mode — no Streamlit container)
+`.env.example` sudah punya default yang benar (database URL, port,
+NYAWA_BINARY, NYAWA_DB). Kamu cuma perlu mengisi 3 key di atas.
 
-Prefer running the app directly on your machine instead of the Docker
-Streamlit container? Only start the *infrastructure* containers, then run
-the app from your local Python:
+### Step 2: Setup Nyawa (opsional, tapi recommended)
+
+Nyawa adalah memory engine bonus (cross-session Q&A recall). Kalau
+skip step ini, semua fitur lain tetap jalan - hanya checkbox memory di
+sidebar yang tidak aktif.
 
 ```bash
-# 1. Start only Postgres + Grafana (infrastructure)
-#    Grafana has a custom Dockerfile (provisioning/dashboards baked in),
-#    so build it first:
+# macOS / Linux: build binary + download BGE embedder files otomatis
+bash scripts/setup_nyawa.sh
+
+# Kalau Streamlit jalan di DOCKER (default), pakai flag ini:
+# (build binary LINUX di dalam container golang, biar CGO enabled)
+bash scripts/setup_nyawa.sh --for-docker
+```
+
+Script ini mengerjakan semuanya: build binary `./nyawa/nyawa` +
+download model all-MiniLM (~23MB) ke `./nyawa/bge/` + verifikasi
+`nyawa version`. Butuh `git` + Go 1.23+ (untuk local) atau Docker
+(untuk `--for-docker`).
+
+**Penting - jangan cross-compile manual.** Kalau kamu build `GOOS=linux`
+dari macOS tanpa `--for-docker`, Go otomatis set `CGO_ENABLED=0` dan
+binary-nya rusak: `go-sqlite3 requires cgo` + `BGE unavailable`. Detail
+di section 9.
+
+### Step 3: Start infrastructure (Postgres + Grafana + Streamlit)
+
+```bash
+docker compose up -d --build
+```
+
+`--build` wajib di run pertama (Grafana & Streamlit pakai custom
+Dockerfile dengan provisioning/image dependencies). Kalau kamu ubah
+file di `grafana/` atau `Dockerfile`, jalankan lagi dengan `--build`
+biar image ke-rebuild.
+
+Verifikasi semua container sehat:
+
+```bash
+docker compose ps
+# Nama          Status
+# rag-pgvector  Up (healthy)
+# rag-grafana   Up
+# rag-streamlit Up
+```
+
+### Step 4: Python environment (untuk scripts ingestion)
+
+```bash
+python -m venv .venv
+source .venv/bin/activate    # macOS/Linux
+pip install -r requirements.txt
+```
+
+### Step 5: Generate chunks & embeddings (one-time)
+
+Folder `data/extracted/`, `data/chunks/`, `data/embeddings/` di-gitignore,
+jadi fresh clone harus build dari PDF yang sudah ada di `data/pdfs/`:
+
+```bash
+python scripts/extract_text.py   # PDFs -> data/extracted/*.txt
+python scripts/chunk.py          # -> data/chunks/*.jsonl (section-based)
+python scripts/embed.py          # -> data/embeddings/*.npy (butuh JINA_API_KEY)
+```
+
+`embed.py` memanggil Jina API untuk 3,670 chunks. Free tier Jina (1M
+token/bulan) cukup. Ada retry otomatis kalau kena rate limit.
+
+### Step 6: Ingest ke Postgres (one-time)
+
+```bash
+python scripts/ingest.py         # dlt loads 3,670 chunks ke Postgres
+python scripts/setup_vector.py   # vector(1024) + HNSW + FTS indexes
+```
+
+### Step 7: Verify retrieval
+
+```bash
+python scripts/verify.py
+```
+
+Harusnya muncul hasil retrieval yang relevan (misal untuk query
+"QRIS"). Kalau error `relation regulatory.regulation_chunks does not
+exist`, berarti Step 6 belum selesai atau gagal.
+
+### Step 8: Buka UI
+
+```bash
+streamlit run app/app.py
+open http://localhost:8501
+# login dengan APP_PASSWORD dari .env
+```
+
+### Run from local (dev mode, tanpa Streamlit container)
+
+Kalau prefer jalanin app langsung di mesin (bukan di container), cuma
+start Postgres + Grafana sebagai infrastruktur:
+
+```bash
+# 1. Infrastruktur saja (Grafana custom image, wajib --build sekali)
 docker compose up -d --build pgvector grafana
 
-# 2. Local Python env
+# 2. Python env + ingestion (sama seperti Step 4-7 di atas)
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-
-# 3. Generate chunks & embeddings from the PDFs (one-time, gitignored dirs)
 python scripts/extract_text.py
 python scripts/chunk.py
 python scripts/embed.py
-
-# 4. Ingest (one-time) — loads chunks into PGVector
 python scripts/ingest.py
 python scripts/setup_vector.py
-
-# 5. Verify retrieval
 python scripts/verify.py
 
-# 6. Run the UI locally
+# 3. Jalankan UI lokal
 streamlit run app/app.py --server.port 8501
 ```
 
-The app connects to Postgres via `DATABASE_URL` in `.env` (default:
-`postgresql://rag:***@localhost:5432/rag_db`).
+**Koneksi database.** App connect via `DATABASE_URL` di `.env`
+(default: `postgresql://rag:rag_password@localhost:5432/rag_db`):
 
-- **Streamlit in Docker** (`docker compose up -d --build`): compose
-  overrides `DATABASE_URL` with host `pgvector` (the service name), so
-  `localhost` in `.env` is ignored — nothing to change.
-- **Local dev mode**: use host `localhost`. If your Postgres runs in
-  Docker on a remote VM, use host `172.17.0.1` (Docker gateway)
-  instead — see `DATABASE_URL` in `.env`.
+- **Streamlit di Docker** (`docker compose up -d --build`): compose
+  override `DATABASE_URL` pakai host `pgvector` (nama service). Kamu
+  gak perlu ubah apa pun.
+- **Local dev mode**: pakai host `localhost`. Kalau Postgres jalan di
+  Docker VM remote, pakai `172.17.0.1` (Docker gateway).
 
 ### Ports
 
@@ -223,23 +284,24 @@ The app connects to Postgres via `DATABASE_URL` in `.env` (default:
 |---------|------|-----|
 | Streamlit UI | 8501 | http://localhost:8501 |
 | Grafana | 3000 | http://localhost:3000 |
-| PostgreSQL | 5432 | (internal, not exposed) |
+| PostgreSQL | 5432 | (internal, gak di-expose) |
 
 ### Troubleshooting
 
 | Symptom | Fix |
 |---------|-----|
-| `dlt` load stuck / stale state | `dlt pipeline rag_regulations drop-pending-packages`, then re-run `ingest.py` |
-| FTS query error `syntax error in tsquery` | Only happens with old code — pull latest (`git pull`) so `fts_query()` sanitizes input |
-| `vector(1024)` column missing | Re-run `python scripts/setup_vector.py` after ingest |
-| Jina 429 rate limit | `embed.py` retries with backoff automatically (10s×attempt) |
-| Grafana shows "no data" | Run `docker exec -i rag-pgvector psql -U rag -d rag_db < scripts/seed_grafana_demo.sql` |
-| Memory toggle does nothing | Nyawa binary missing — check `nyawa/nyawa` exists, or it degrades gracefully (app still works) |
+| `dlt` load stuck / stale state | `dlt pipeline rag_regulations drop-pending-packages`, lalu run ulang `ingest.py` |
+| FTS error `syntax error in tsquery` | Kode lama - `git pull` supaya `fts_query()` sanitize input |
+| `vector(1024)` column missing | Run ulang `python scripts/setup_vector.py` setelah ingest |
+| Jina 429 rate limit | `embed.py` retry otomatis (backoff 10s x attempt) |
+| Grafana "no data" | `docker exec -i rag-pgvector psql -U rag -d rag_db < scripts/seed_grafana_demo.sql` |
+| Memory toggle gak ada efek | Cek sidebar: warning amber = binary Nyawa missing, jalankan `bash scripts/setup_nyawa.sh --for-docker` lalu `docker compose up -d --build streamlit` |
+| Grafana "Datasource PG was not found" | Image lama - rebuild: `docker compose up -d --build grafana` |
 
 ### Re-ingest from scratch (re-download PDFs)
 
 ```bash
-python scripts/fetch_pdfs.py     # 15 docs -> data/pdfs/  (OJK/BI URLs)
+python scripts/fetch_pdfs.py     # 15 docs -> data/pdfs/ (OJK/BI URLs)
 python scripts/extract_text.py   # PDF -> data/extracted/*.txt
 python scripts/chunk.py          # -> data/chunks/*.jsonl (~3.7k chunks)
 python scripts/embed.py          # -> data/embeddings/*.npy (Jina API)
@@ -248,37 +310,39 @@ python scripts/setup_vector.py   # pgvector + HNSW + FTS indexes
 python scripts/verify.py         # smoke test
 ```
 
-> If you hit a stale DB state after a failed run, reset:
-> `dlt pipeline rag_regulations drop-pending-packages` then
-> `DROP SCHEMA regulatory CASCADE` in Postgres, then re-run.
+> Kalau DB kena state stale setelah run gagal, reset:
+> `dlt pipeline rag_regulations drop-pending-packages`, lalu
+> `DROP SCHEMA regulatory CASCADE` di Postgres, lalu run ulang.
 
 ## 6. Project Structure
 
 ```
 ├── app/
-│   ├── app.py              # Streamlit UI (login, chat, citations, feedback)
+│   ├── app.py              # Streamlit UI (login, chat, citations, feedback, EN/ID toggle)
 │   ├── rag_engine.py       # Hybrid search + RRF + Jina reranker + rewrite
 │   ├── llm_flow.py         # 2 prompt versions (V1 strict citation / V2 structured)
 │   ├── conversations.py    # Postgres logging (for Grafana)
 │   └── memory_layer.py     # Nyawa memory (optional bonus feature)
 ├── scripts/
 │   ├── fetch_pdfs.py       # download from OJK/BI (browser UA + verify=False)
-│   ├── extract_text.py     # PDF → text
+│   ├── extract_text.py     # PDF -> text
 │   ├── chunk.py            # pasal-aware chunking (3,670 chunks)
 │   ├── embed.py            # Jina embeddings (1024-dim)
-│   ├── ingest.py           # dlt pipeline → PostgreSQL
+│   ├── ingest.py           # dlt pipeline -> PostgreSQL
 │   ├── setup_vector.py     # vector(1024) + HNSW + FTS indexes
 │   ├── verify.py           # smoke tests
-│   ├── rag_ask.py          # end-to-end CLI: retrieve → answer → log
+│   ├── rag_ask.py          # end-to-end CLI: retrieve -> answer -> log
 │   ├── retrieval_test.py   # 10-query retrieval smoke test
 │   ├── gen_ground_truth.py # generate eval Q&A pairs (30)
 │   ├── eval_retrieval.py   # HitRate@5 + MRR@5 (3 strategies)
 │   ├── eval_llm.py         # LLM-as-a-Judge (v1 vs v2)
+│   ├── setup_nyawa.sh      # one-command Nyawa installer (binary + BGE files)
+│   ├── bge_server.py       # BGE embedder helper used by Nyawa (bundled)
 │   └── seed_grafana_demo.sql  # demo data for the monitoring dashboard
 ├── data/
-│   ├── pdfs/               # 15 source PDFs (committed — public domain)
+│   ├── pdfs/               # 15 source PDFs (committed, public domain)
 │   ├── sources.yaml        # document manifest with canonical URLs
-│   └── (extracted/, chunks/, embeddings/ — generated, gitignored)
+│   └── (extracted/, chunks/, embeddings/ - generated, gitignored)
 ├── evaluation/
 │   ├── ground_truth.json   # 30 Q&A pairs (2 per document)
 │   └── results/
@@ -288,10 +352,9 @@ python scripts/verify.py         # smoke test
 │   ├── Dockerfile              # custom image with provisioning baked in
 │   ├── provisioning/           # datasource + dashboard provider
 │   └── dashboards/rag-monitoring.json
-├── nyawa/nyawa             # Nyawa v1.0.0 binary (bonus memory feature)
-├── scripts/
-│   ├── setup_nyawa.sh      # one-command Nyawa installer (see §9)
-│   └── ...                 # fetch/extract/chunk/embed/ingest/verify/eval
+├── nyawa/                  # created by setup_nyawa.sh (gitignored binary)
+│   ├── nyawa               # Nyawa v1.0.0 binary
+│   └── bge/                # BGE embedder files (bge_server.py + ONNX model)
 ├── docker-compose.yml      # pgvector + grafana + streamlit
 ├── Dockerfile              # Streamlit app image
 └── requirements.txt        # pinned versions
@@ -299,11 +362,11 @@ python scripts/verify.py         # smoke test
 
 ## 7. Evaluation
 
-Evaluation artifacts live in `evaluation/` (reproducible via the `eval_*`
-scripts). This section is also reflected in the README per the course's
-"mention the evaluation criteria" recommendation.
+Evaluation artifacts live in `evaluation/` and are reproducible via the
+`eval_*` scripts. This section also maps to the course's evaluation
+criteria (see section 10).
 
-### 7.1 Retrieval evaluation — 3 strategies
+### 7.1 Retrieval evaluation - 3 strategies
 
 Ground truth: 30 Q&A pairs generated from the regulation chunks (2 per
 document, `scripts/gen_ground_truth.py`). Metrics: Hit Rate@5 and MRR@5.
@@ -314,20 +377,20 @@ document, `scripts/gen_ground_truth.py`). Metrics: Hit Rate@5 and MRR@5.
 | FTS (Postgres full-text) | 0.700 | 0.386 |
 | **Hybrid (dense + FTS + RRF)** | **0.800** | **0.667** |
 
-**The hybrid strategy is used in production** — RRF fusion improves ranking
-(MRR 0.667 vs 0.631 for dense-only) by combining semantic and lexical
-signals. Reproduce with:
+**The hybrid strategy is used in production.** RRF fusion improves
+ranking (MRR 0.667 vs 0.631 for dense-only) by combining semantic and
+lexical signals. Reproduce with:
 
 ```bash
 python scripts/eval_retrieval.py
 ```
 
-### 7.2 LLM evaluation — 2 prompt versions, LLM-as-a-Judge
+### 7.2 LLM evaluation - 2 prompt versions, LLM-as-a-Judge
 
 Two prompt templates:
 
-- **V1 — strict citation**: answers every claim with `[document pasal]`
-- **V2 — structured**: answer summary / key points / legal basis sections
+- **V1 - strict citation**: answers every claim with `[document pasal]`
+- **V2 - structured**: answer summary / key points / legal basis sections
 
 The judge LLM scores each answer on 4 criteria (1-5): relevance,
 groundedness, completeness, citations.
@@ -338,8 +401,8 @@ groundedness, completeness, citations.
 | V2 structured | 4.60 | 3.20 | 4.20 | 3.37 | 3.84 |
 
 Result (judge: deepseek-v4-flash, 30 questions): **V1 wins and is the
-default** in the UI. The result is consistent with an earlier run using a
-different judge model (gpt-5.4-mini: V1 3.95 vs V2 3.69). Reproduce with:
+default** in the UI. This is consistent with an earlier run using a
+different judge model (gpt-5.4-mini: V1 3.95 vs V2 3.69). Reproduce:
 
 ```bash
 python scripts/eval_llm.py --sample 30
@@ -348,51 +411,63 @@ python scripts/eval_llm.py --sample 30
 ## 8. Monitoring (Grafana)
 
 The Grafana dashboard **"RAG Monitoring"** is provisioned automatically
-(custom image, `grafana/`). It has **6 charts** fed by the
-`regulatory.conversations` table (every chat interaction + 👍/👎 feedback):
+(custom image, `grafana/`). It has 13 panels fed by the
+`regulatory.conversations` table (every chat interaction + feedback)
+and `regulatory.nyawa_recalls` (memory metrics):
 
-1. Pertanyaan per Hari — queries per day (time series)
-2. Total Pertanyaan — total count (stat)
-3. Feedback Pengguna (👍/👎) — feedback distribution (bar)
-4. Token per Pertanyaan — LLM usage per query (time series)
-5. Prompt Version — v1 vs v2 usage (pie)
-6. Dokumen Paling Dikutip — top cited documents (bar)
+- Queries per Day (time series)
+- Total Queries (stat)
+- User Feedback (bar chart)
+- Tokens per Query (time series)
+- Prompt Version (pie)
+- Most Cited Documents (bar)
+- Avg Tokens / Query, Avg Docs Cited, Positive Feedback (%) (stats)
+- Recent Conversations (Detail) - table of the last 50 Q&A: query,
+  answer preview, prompt version, model, tokens, feedback, cited docs
+- Nyawa Avg Relevance, Nyawa Recall Relevance over Time, Nyawa Recall
+  Results per Query (memory metrics)
 
-Open `http://localhost:3000` (admin / GRAFANA_PASSWORD from `.env`). To see
-data immediately, seed the demo set:
+Open `http://localhost:3000` (admin / GRAFANA_PASSWORD from `.env`).
+To see data immediately, seed the demo set:
 
 ```bash
 docker exec -i rag-pgvector psql -U rag -d rag_db \
   < scripts/seed_grafana_demo.sql
 ```
 
+Setiap perubahan di `grafana/` butuh rebuild image:
+
+```bash
+docker compose up -d --build grafana
+```
+
 ## 9. Nyawa Memory Layer (Bonus Feature)
 
-### What is Nyawa?
+### Apa itu Nyawa?
 
-[Nyawa](https://github.com/rezkyauliapratama/nyawa) ("soul" in Indonesian)
-is an **offline-first AI memory engine** written in Go. It is a single
-~8 MB binary with zero runtime dependencies (just SQLite): semantic
-memory recall (HNSW + FTS5 hybrid search), a built-in RAG engine,
-namespaces, and an MCP server so any AI agent can talk to it.
+[Nyawa](https://github.com/rezkyauliapratama/nyawa) ("soul" in
+Indonesian) is an **offline-first AI memory engine** written in Go. It
+is a single ~8 MB binary with zero runtime dependencies (just SQLite):
+semantic memory recall (HNSW + FTS5 hybrid search), a built-in RAG
+engine, namespaces, and an MCP server so any AI agent can talk to it.
 
-```
+```bash
 go build + one binary -> memory that lasts, no cloud, no Docker, no vector DB
 ```
 
-### Why Nyawa here?
+### Kenapa Nyawa dipakai?
 
-- **Cross-session conversation memory** — the chat UI stores every Q&A
-  pair and recalls related past conversations, so users get continuity
-  across sessions (the `Use session memory (Nyawa)` checkbox in the
-  sidebar).
-- **Offline & private** — all memory lives in a local SQLite file
-  (`data/nyawa_memory.db`); nothing leaves the machine.
-- **Zero infrastructure** — no separate service, no API key, no network.
-- **Evaluated as a bonus** — it adds the *cross-session recall* bonus
-  point in the rubric (see §10) without complicating the architecture.
-- **Open source** — MIT-licensed, so reviewers can audit exactly how the
-  memory layer behaves.
+- **Cross-session conversation memory** - chat UI menyimpan tiap Q&A
+  pair dan me-recall percakapan terkait, jadi user dapat continuity
+  antar session (checkbox "Use session memory (Nyawa)" di sidebar)
+- **Offline & private** - semua memory ada di file SQLite lokal
+  (`data/nyawa_memory.db`), tidak ada yang keluar dari mesin
+- **Zero infrastructure** - tidak perlu service terpisah, API key, atau
+  network
+- **Bonus rubric point** - menambah *cross-session recall* bonus point
+  (lihat section 10)
+- **Open source** - MIT license, reviewer bisa audit cara kerja memory
+  layer
 
 ### Source
 
@@ -404,98 +479,108 @@ go build + one binary -> memory that lasts, no cloud, no Docker, no vector DB
 | Latest release | v1.0.0 (80 commits, stable) |
 | Build size | ~8.1 MB (single binary) |
 
-### Install — easiest: one command (recommended)
+### Install - cara termudah: 1 command (recommended)
 
 ```bash
-bash scripts/setup_nyawa.sh              # local run (macOS/Linux host)
-bash scripts/setup_nyawa.sh --for-docker # Docker container (Linux binary)
+# macOS / Linux, untuk jalan lokal:
+bash scripts/setup_nyawa.sh
+
+# macOS / Linux, kalau Streamlit jalan di DOCKER (default di project ini):
+bash scripts/setup_nyawa.sh --for-docker
 ```
 
-The script installs a **working** binary and verifies it:
-- **Local run** → builds from source natively (CGO stays enabled, which
-  go-sqlite3 and the BGE embedder require)
-- **`--for-docker`** → builds inside a `golang:1.23` Docker container so
-  the Linux binary is compiled **on Linux with CGO enabled**, then copies
-  it to `./nyawa/nyawa`
+Script ini otomatis:
+1. Deteksi OS + architecture (macOS arm64, macOS amd64, Linux arm64,
+   Linux amd64 semua didukung)
+2. Build binary Nyawa v1.0.0 dari source (native build, CGO enabled)
+   - `--for-docker` build di dalam container `golang:1.23` biar
+     binary-nya LINUX (cocok dengan container streamlit)
+3. Download BGE embedder files (bge_server.py + model all-MiniLM ONNX
+   ~23MB dari Hugging Face) ke `./nyawa/bge/`
+4. Verifikasi dengan `nyawa version`
 
-> **Why not cross-compile?** Building with `GOOS=linux` on macOS silently
-> sets `CGO_ENABLED=0`, which produces a broken binary that fails with
-> `go-sqlite3 requires cgo to work` and `BGE unavailable`. The binary
-> must be built on the same OS the app runs on — that is exactly what
-> `--for-docker` does (build inside a Linux container). Requires Docker;
-> without it the script falls back to the prebuilt `linux/amd64` release
-> binary (only correct if your container is amd64).
+Requirement: `git` + Go 1.23+ untuk local mode; Docker untuk
+`--for-docker`.
 
-### Install — Option A: download a release binary (Linux x86_64)
+> **Kenapa tidak cross-compile manual?** Kalau kamu build `GOOS=linux`
+> dari macOS, Go otomatis set `CGO_ENABLED=0`. Binary hasilnya rusak:
+> `go-sqlite3 requires cgo to work` dan `BGE unavailable`. Binary harus
+> di-build di OS yang sama dengan tempat app jalan. Itulah yang
+> dilakukan `--for-docker` (build di dalam container Linux). Tanpa
+> Docker, script fallback ke release binary `linux/amd64` (hanya benar
+> kalau container kamu amd64).
+
+### Install - Option A: download release binary (Linux x86_64 only)
 
 ```bash
 curl -L -o nyawa.gz https://github.com/rezkyauliapratama/nyawa/releases/download/v1.0.0/nyawa-linux-amd64.gz
 gunzip nyawa.gz && chmod +x nyawa && mv nyawa ./nyawa/nyawa
 ```
 
-### Install — Option B: build from source (macOS / any platform)
+### Install - Option B: build manual dari source (macOS / Linux)
 
-Requires [Go 1.23+](https://go.dev/dl/). Cloning a specific release
-tag works the same as cloning `main` — checkout `v1.0.0` for the
-stable, tested version:
+Requires [Go 1.23+](https://go.dev/dl/). Clone tag release `v1.0.0`
+(bukan `main`, biar stable & tested):
 
 ```bash
 git clone --branch v1.0.0 --depth 1 https://github.com/rezkyauliapratama/nyawa.git
 cd nyawa
 make build                # -> ./nyawa  (uses sqlite_fts5 build tag)
 
-# macOS Apple Silicon: cross-compile target for your OS
-GOOS=darwin GOARCH=arm64 go build -tags "sqlite_fts5" -ldflags="-s -w" -o nyawa ./cmd/nyawa/
+# verifikasi
+./nyawa version           # nyawa v1.0.0
 
-# verify
-./nyawa --version         # Nyawa — Offline-First AI Memory Engine v1.0.0
-
-# place it where this project expects it
+# taruh di tempat yang project ini harapkan
 mkdir -p ../ojk-regulatory-assistant/nyawa
 cp nyawa ../ojk-regulatory-assistant/nyawa/nyawa
 ```
 
-### Wire it into this project
+### Integrasi ke project (setelah binary + BGE files ada)
 
 ```bash
-# 1. .env (defaults already point here, adjust if you moved things)
+# 1. .env (default sudah menunjuk ke sini, sesuaikan kalau pindah)
 NYAWA_BINARY=./nyawa/nyawa
 NYAWA_DB=./data/nyawa_memory.db
 
-# 2. Start the app — the memory layer auto-detects the binary
+# 2. REBUILD streamlit image (wajib - image baru install onnxruntime
+#    & mount folder ./nyawa/bge ke path yang dicari Nyawa)
 docker compose up -d --build streamlit
-# or locally: streamlit run app/app.py
 
-# 3. In the sidebar: tick "Use session memory (Nyawa)"
-#    - green "Available" = binary found
-#    - amber warning with the expected path = binary missing
+# 3. Buka UI, centang "Use session memory (Nyawa)" di sidebar
+#    - hijau "Available" = binary + embedder jalan
+#    - amber warning = binary/BGE files belum lengkap
 ```
 
-The integration lives in `app/memory_layer.py` (thin MCP-over-stdio
-wrapper): each Q&A is stored via `nyawa_store` and related conversations
-are recalled via `nyawa_recall` on every query. Recall metrics
-(n_results, avg/max relevance score) are also logged to
-`regulatory.nyawa_recalls` and shown in the Grafana dashboard (§8).
+**Struktur mount.** Nyawa v1.0.0 hardcode path BGE embedder di
+`/opt/data/nyawa/internal/embedder`. docker-compose.yml mount
+`./nyawa/bge` ke path itu (read-only), jadi file embedder dari host
+langsung terlihat di container. Dockerfile juga install
+`onnxruntime`, `numpy`, `tokenizers` (dependency Python bge_server.py).
 
-> Nyawa is fully optional. Without the binary the app degrades
-> gracefully — the memory checkbox simply has no effect and the chat
-> keeps working normally.
+**Cara kerja.** `app/memory_layer.py` adalah thin MCP-over-stdio
+wrapper: tiap Q&A di-store via `nyawa_store` dan percakapan terkait
+di-recall via `nyawa_recall` di tiap query. Recall metrics (n_results,
+avg/max relevance score) juga di-log ke `regulatory.nyawa_recalls` dan
+tampil di dashboard Grafana (section 8).
+
+**Nyawa fully optional.** Tanpa binary, app degrade gracefully -
+checkbox memory tidak ada efek, chat tetap jalan normal.
 
 ## 10. Evaluation Criteria Mapping
 
 | Criterion | Implementation | Points |
 |-----------|----------------|--------|
-| Problem description | README §1 + §2 | 2 |
-| Retrieval flow | PGVector KB + DeepSeek LLM (§3) | 2 |
-| Retrieval evaluation | 3 strategies, best (hybrid) used (§7.1) | 2 |
-| LLM evaluation | 2 prompts, LLM-as-a-Judge, best (V1) used (§7.2) | 2 |
-| Interface | Streamlit UI: login, chat, citations, feedback | 2 |
+| Problem description | README section 1 + 2 | 2 |
+| Retrieval flow | PGVector KB + DeepSeek LLM (section 3) | 2 |
+| Retrieval evaluation | 3 strategies, best (hybrid) used (section 7.1) | 2 |
+| LLM evaluation | 2 prompts, LLM-as-a-Judge, best (V1) used (section 7.2) | 2 |
+| Interface | Streamlit UI: login, chat, citations, feedback, EN/ID toggle | 2 |
 | Ingestion pipeline | dlt (automated, incremental) | 2 |
-| Monitoring | User feedback + Grafana dashboard 6 charts | 2 |
+| Monitoring | User feedback + Grafana dashboard 13 panels | 2 |
 | Containerization | Full docker-compose (pgvector + grafana + streamlit) | 2 |
 | Reproducibility | PDFs committed, pinned versions, clear steps | 2 |
 | Best practice: hybrid search | Dense + FTS + RRF, evaluated | +1 |
-| Best practice: reranking | Jina cross-encoder, top-10 → top-5 | +1 |
+| Best practice: reranking | Jina cross-encoder, top-10 -> top-5 | +1 |
 | Best practice: query rewriting | LLM expands acronyms (KPMM, ITSK, PJP...) | +1 |
 | Bonus: Nyawa memory layer | Offline memory engine, cross-session recall | +1 |
 
@@ -507,9 +592,9 @@ are recalled via `nyawa_recall` on every query. Recall metrics
 | Jina AI | Embeddings + reranker | `JINA_API_KEY` |
 | (optional) OpenRouter | Alternative LLM provider | swap in `.env` |
 
-Free tiers: Jina offers 1M free embedding tokens/month; DeepSeek pricing is
-~$0.02/M tokens (a full evaluation run costs a few cents). The embedding
-step (~3.7k chunks) runs on Jina's free tier.
+Free tiers: Jina offers 1M free embedding tokens/month; DeepSeek pricing
+is ~$0.02/M tokens (a full evaluation run costs a few cents). The
+embedding step (~3.7k chunks) runs on Jina's free tier.
 
 ## 12. Glossary
 
@@ -517,93 +602,112 @@ Terminology used throughout this project, explained in plain language.
 
 ### Core RAG concepts
 
-- **RAG (Retrieval-Augmented Generation)** — a pattern where the LLM's
-  answer is grounded in documents retrieved from a knowledge base, instead
-  of relying only on its training data. Steps: retrieve relevant chunks →
-  feed them to the LLM as context → generate an answer with citations.
-- **Chunk / Chunking** — splitting a long document into smaller pieces
+- **RAG (Retrieval-Augmented Generation)** - a pattern where the LLM's
+  answer is grounded in documents retrieved from a knowledge base,
+  instead of relying only on its training data. Steps: retrieve relevant
+  chunks, feed them to the LLM as context, generate an answer with
+  citations.
+- **Chunk / Chunking** - splitting a long document into smaller pieces
   (here: per *BAB* / *Pasal* section). Each chunk is embedded and stored
   separately so retrieval can find the exact relevant part of a 50-page
   regulation.
-- **Embedding** — a numerical vector (list of numbers) that captures the
-  *meaning* of a text. Similar texts get similar vectors, which is what
-  enables semantic search. This project uses **Jina AI
-  (`jina-embeddings-v3`)**, 1024 dimensions, multilingual (supports
-  Indonesian).
-- **Vector database** — a store optimized for similarity search over
+- **Embedding** - a numerical vector (list of numbers) that captures the
+  *meaning* of a text. Similar texts get similar vectors, which enables
+  semantic search. This project uses **Jina AI (`jina-embeddings-v3`)**
+  with 1024 dimensions, multilingual (supports Indonesian).
+- **Vector database** - a store optimized for similarity search over
   embeddings. Here: **PGVector**, a PostgreSQL extension (not a separate
-  database — it lives inside Postgres).
-- **HNSW index** — *Hierarchical Navigable Small World*: the graph-based
+  database, it lives inside Postgres).
+- **HNSW index** - *Hierarchical Navigable Small World*: the graph-based
   algorithm PGVector uses to answer "give me the 5 most similar vectors"
   quickly, even with thousands of chunks.
-- **Cosine similarity** — the distance metric used by the HNSW index to
+- **Cosine similarity** - the distance metric used by the HNSW index to
   compare embeddings (angle between vectors, 0..1). `vector_cosine_ops`
   in the index definition refers to this.
 
 ### Retrieval strategies
 
-- **Dense retrieval** — semantic search over embeddings (PGVector cosine).
-  Understands meaning, synonyms, and paraphrases.
-- **Sparse / FTS (Full-Text Search)** — keyword search over the text using
-  PostgreSQL `tsvector` + `GIN` index. Exact terms, good for codes like
-  "POJK", "QRIS", "KPMM".
-- **Hybrid search** — running dense + FTS together and merging results.
-- **RRF (Reciprocal Rank Fusion)** — the merging method: for each
+- **Dense retrieval** - semantic search over embeddings (PGVector
+  cosine). Understands meaning, synonyms, and paraphrases.
+- **Sparse / FTS (Full-Text Search)** - keyword search over the text
+  using PostgreSQL `tsvector` + `GIN` index. Exact terms, good for codes
+  like "POJK", "QRIS", "KPMM".
+- **Hybrid search** - running dense + FTS together and merging results.
+- **RRF (Reciprocal Rank Fusion)** - the merging method: for each
   candidate, sum `1 / (k + rank)` from each strategy (k=60 default).
   Simple, robust, no score normalization needed. Best retrieval strategy
   in this project's evaluation (MRR 0.667).
-- **Reranking** — after retrieval returns top-10 candidates, a second,
-  more precise model (Jina `jina-reranker-v2-base-multilingual`,
-  a cross-encoder) re-scores them to pick the top-5. Improves precision
-  at the cost of one extra API call.
-- **Query rewriting** — before retrieval, the LLM rewrites the user's
-  query: expands acronyms (KPMM → Kewajiban Penyediaan Modal Minimum),
+- **Reranking** - after retrieval returns top-10 candidates, a second,
+  more precise model (Jina `jina-reranker-v2-base-multilingual`, a
+  cross-encoder) re-scores them to pick the top-5. Improves precision at
+  the cost of one extra API call.
+- **Query rewriting** - before retrieval, the LLM rewrites the user's
+  query: expands acronyms (KPMM -> Kewajiban Penyediaan Modal Minimum),
   adds context, fixes typos. Improves recall on jargon-heavy queries.
 
 ### Pipeline & infrastructure
 
-- **dlt (data load tool)** — the Python library used for the ingestion
+- **dlt (data load tool)** - the Python library used for the ingestion
   pipeline: reads chunk files, infers a schema, and loads them into
   PostgreSQL with incremental merge on `chunk_id`. Re-runs are safe
   (no duplicate chunks).
-- **`dataset_name`** — dlt's term for the Postgres schema where it
+- **`dataset_name`** - dlt's term for the Postgres schema where it
   creates tables (here: `regulatory`).
-- **Pipeline** — the full ingestion flow: PDF → extract text → chunk →
-  embed → load into PGVector. Each step is a script in `scripts/`.
-- **PGVector** — see *Vector database* above.
-- **Docker Compose** — the tool that runs the 3 services
-  (`pgvector`, `grafana`, `streamlit`) together with one command.
-- **Containerization** — packaging an app with its dependencies into a
+- **Pipeline** - the full ingestion flow: PDF -> extract text -> chunk
+  -> embed -> load into PGVector. Each step is a script in `scripts/`.
+- **PGVector** - see *Vector database* above.
+- **Docker Compose** - the tool that runs the 3 services (`pgvector`,
+  `grafana`, `streamlit`) together with one command.
+- **Containerization** - packaging an app with its dependencies into a
   container image so it runs identically anywhere.
 
 ### LLM & evaluation
 
-- **LLM-as-a-Judge** — using an LLM to score another LLM's answers
+- **LLM-as-a-Judge** - using an LLM to score another LLM's answers
   (instead of a human). Two prompt versions (v1: strict citations,
   v2: structured) were compared; the judge scored v1 higher (3.92 vs
   3.84 with DeepSeek as judge), so v1 is the default.
-- **Hit Rate** — fraction of test queries where the correct document was
+- **Hit Rate** - fraction of test queries where the correct document was
   retrieved in the top-k results.
-- **MRR (Mean Reciprocal Rank)** — for each query, `1 / rank` of the
+- **MRR (Mean Reciprocal Rank)** - for each query, `1 / rank` of the
   first correct result, averaged. Higher = relevant docs appear earlier.
-- **Ground truth** — a curated set of (query → expected document)
-  pairs used to measure retrieval quality.
-- **Prompt version** — a variation of the system prompt given to the LLM.
-  This project evaluates 2 versions and picks the better one.
+- **Ground truth** - a curated set of (query -> expected document) pairs
+  used to measure retrieval quality.
+- **Prompt version** - a variation of the system prompt given to the
+  LLM. This project evaluates 2 versions and picks the better one.
 
 ### Monitoring
 
-- **Grafana** — the open-source dashboard tool that visualizes data from
+- **Grafana** - the open-source dashboard tool that visualizes data from
   PostgreSQL (query volume, feedback, token usage, per-conversation
   detail).
-- **Datasource** — Grafana's connection to a data source (here: the
+- **Datasource** - Grafana's connection to a data source (here: the
   `PostgreSQL` datasource, UID `PG`, pointing at the `pgvector` service).
-- **Provisioning** — configuring Grafana (datasources + dashboards) via
-  files baked into the custom image, so a fresh `docker compose up`
-  gets a fully configured Grafana with no manual clicks.
+- **Provisioning** - configuring Grafana (datasources + dashboards) via
+  files baked into the custom image, so a fresh `docker compose up` gets
+  a fully configured Grafana with no manual clicks.
+
+### Nyawa memory layer
+
+- **Nyawa** - an offline-first AI memory engine written in Go. Stores
+  Q&A pairs in SQLite and recalls related past conversations via hybrid
+  search (HNSW vector + FTS5 keyword).
+- **MCP (Model Context Protocol)** - the protocol Nyawa uses to expose
+  tools (`nyawa_store`, `nyawa_recall`) over stdio, so the Streamlit app
+  can call it like a small local server.
+- **BGE embedder** - the local embedding model (all-MiniLM-L6-v2, ONNX,
+  384-dim) Nyawa uses to vectorize text. Needs `bge_server.py` + model
+  files at `/opt/data/nyawa/internal/embedder` (mounted from
+  `./nyawa/bge/`).
+- **CGO** - a Go mechanism to call C code; go-sqlite3 requires it.
+  Cross-compiling with `GOOS=linux` from macOS disables it, producing a
+  broken Nyawa binary.
+- **Namespace** - a label that separates memories into groups (here:
+  `rag_qa` for chat Q&A).
 
 ## 13. License
 
-MIT — educational project. Regulatory documents remain property of their
-issuers (OJK / Bank Indonesia), reproduced for educational purposes under
-Article 42 of Indonesian Copyright Law No. 28/2014.
+MIT - educational project. Regulatory documents remain property of their
+issuers (OJK / Bank Indonesia), reproduced for educational purposes
+under Article 42 of Indonesian Copyright Law No. 28/2014.
+
