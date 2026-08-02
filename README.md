@@ -131,6 +131,16 @@ LLM_MODEL=gpt-5.4-mini
 
 ## 5. Quick Start
 
+### Prerequisites
+
+| Requirement | Version / Notes |
+|-------------|-----------------|
+| Python | 3.11+ (tested on 3.13) |
+| Docker + Docker Compose | for Postgres + Grafana |
+| Jina API key | https://jina.ai (free tier: 1M tokens/mo) |
+| DeepSeek API key | https://platform.deepseek.com (cheap, ~$0.02/M tokens) |
+| RAM | ~2 GB for the app + Postgres (fine on a small VM) |
+
 ```bash
 # 1. Clone & configure
 git clone https://github.com/rezkyauliapratama/ojk-regulatory-assistant.git
@@ -155,10 +165,54 @@ streamlit run app/app.py
 open http://localhost:8501       # login with APP_PASSWORD
 ```
 
-> **Note for reviewers:** the whole pipeline runs in ~5 minutes including
-> the Jina API calls. If you have limited API budget, the PGVector database
-> can be re-created from the committed chunks + Jina embeddings (~3,670 API
-> calls, ~10 min, Jina free tier covers this).
+### Run from local (dev mode — no Streamlit container)
+
+Prefer running the app directly on your machine instead of the Docker
+Streamlit container? Only start the *infrastructure* containers, then run
+the app from your local Python:
+
+```bash
+# 1. Start only Postgres + Grafana (infrastructure)
+docker compose up -d pgvector grafana
+
+# 2. Local Python env
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+
+# 3. Ingest (one-time) — PDFs already committed, no download needed
+python scripts/ingest.py
+python scripts/setup_vector.py
+
+# 4. Verify retrieval
+python scripts/verify.py
+
+# 5. Run the UI locally
+streamlit run app/app.py --server.port 8501
+```
+
+The app connects to Postgres via `DATABASE_URL` in `.env` (default:
+`postgresql://ojk:change_me@localhost:5432/ojk_regulatory`). If your
+Postgres runs in Docker, use host `172.17.0.1` (Docker gateway) instead
+of `localhost` — see `DATABASE_URL` in `.env`.
+
+### Ports
+
+| Service | Port | URL |
+|---------|------|-----|
+| Streamlit UI | 8501 | http://localhost:8501 |
+| Grafana | 3000 | http://localhost:3000 |
+| PostgreSQL | 5432 | (internal, not exposed) |
+
+### Troubleshooting
+
+| Symptom | Fix |
+|---------|-----|
+| `dlt` load stuck / stale state | `dlt pipeline ojk_regulations drop-pending-packages`, then re-run `ingest.py` |
+| FTS query error `syntax error in tsquery` | Only happens with old code — pull latest (`git pull`) so `fts_query()` sanitizes input |
+| `vector(1024)` column missing | Re-run `python scripts/setup_vector.py` after ingest |
+| Jina 429 rate limit | `embed.py` retries with backoff automatically (10s×attempt) |
+| Grafana shows "no data" | Run `docker exec -i ojk-pgvector psql -U ojk -d ojk_regulatory < scripts/seed_grafana_demo.sql` |
+| Memory toggle does nothing | Nyawa binary missing — check `nyawa/nyawa` exists, or it degrades gracefully (app still works) |
 
 ### Re-ingest from scratch (re-download PDFs)
 
