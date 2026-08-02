@@ -156,14 +156,21 @@ docker compose up -d --build
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
-# 4. Ingest regulations (PDFs already in data/pdfs/ — no download needed)
-python scripts/ingest.py         # dlt loads 3,670 chunks into PGVector
-python scripts/setup_vector.py   # vector(1024) + HNSW + FTS indexes
+# 4. Generate chunks & embeddings from the PDFs (one-time).
+#    data/extracted/, data/chunks/, data/embeddings/ are gitignored,
+#    so a fresh clone must build them first:
+python scripts/extract_text.py     # PDFs -> data/extracted/*.txt
+python scripts/chunk.py            # -> data/chunks/*.jsonl (section-based)
+python scripts/embed.py            # -> data/embeddings/*.npy (Jina API, needs JINA_API_KEY)
 
-# 5. Verify retrieval works
+# 5. Ingest regulations (loads 3,670 chunks into PGVector)
+python scripts/ingest.py           # dlt loads chunks into Postgres
+python scripts/setup_vector.py     # vector(1024) + HNSW + FTS indexes
+
+# 6. Verify retrieval works
 python scripts/verify.py
 
-# 6. Open the chat UI
+# 7. Open the chat UI
 streamlit run app/app.py
 open http://localhost:8501       # login with APP_PASSWORD
 ```
@@ -184,14 +191,19 @@ docker compose up -d --build pgvector grafana
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
-# 3. Ingest (one-time) — PDFs already committed, no download needed
+# 3. Generate chunks & embeddings from the PDFs (one-time, gitignored dirs)
+python scripts/extract_text.py
+python scripts/chunk.py
+python scripts/embed.py
+
+# 4. Ingest (one-time) — loads chunks into PGVector
 python scripts/ingest.py
 python scripts/setup_vector.py
 
-# 4. Verify retrieval
+# 5. Verify retrieval
 python scripts/verify.py
 
-# 5. Run the UI locally
+# 6. Run the UI locally
 streamlit run app/app.py --server.port 8501
 ```
 
