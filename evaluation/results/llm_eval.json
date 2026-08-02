@@ -1,0 +1,27 @@
+{
+  "results": {
+    "v1": {
+      "mean": {
+        "relevance": 4.67,
+        "groundedness": 3.1,
+        "completeness": 4.27,
+        "citations": 3.63,
+        "overall": 3.92
+      },
+      "n": 30
+    },
+    "v2": {
+      "mean": {
+        "relevance": 4.6,
+        "groundedness": 3.2,
+        "completeness": 4.2,
+        "citations": 3.37,
+        "overall": 3.84
+      },
+      "n": 30
+    }
+  },
+  "details": [],
+  "judge_model": "deepseek-v4-flash",
+  "judge_note": "Re-run 2026-08-02: judge + answer model = deepseek-v4-flash (DeepSeek API)"
+}

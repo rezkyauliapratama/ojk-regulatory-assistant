@@ -13,7 +13,8 @@ venv/
 # --- Generated data (NOT committed — reproducible from data/pdfs) ---
 data/extracted/
 data/chunks/
-data/nyawa_memory.db
+data/nyawa_memory.db*
+data/nyawa_memory.db.hnsw
 *.duckdb
 *.db
 

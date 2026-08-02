@@ -1,0 +1,17 @@
+{
+  "dense": {
+    "hit_rate_at_5": 0.8,
+    "mrr_at_5": 0.6306,
+    "n": 30
+  },
+  "fts": {
+    "hit_rate_at_5": 0.7,
+    "mrr_at_5": 0.3856,
+    "n": 30
+  },
+  "hybrid": {
+    "hit_rate_at_5": 0.8,
+    "mrr_at_5": 0.6667,
+    "n": 30
+  }
+}
