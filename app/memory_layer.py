@@ -64,11 +64,21 @@ class MemoryLayer:
         return None
 
     def recall(self, query: str, namespace: str = "ojk_qa", limit: int = 3) -> list[dict]:
-        """Recall related past Q&A. Returns list of {content, score} or []."""
+        """Recall related past Q&A. Returns list of {content, score} or [].
+
+        Normalizes Nyawa's capitalized keys (ID/Content/Score/Type/
+        Namespace/CreatedAt) to lowercase for the app layer.
+        """
         res = self._call(
             "nyawa_recall",
             {"query": query, "namespace": namespace, "limit": limit},
         )
-        if res and isinstance(res, dict):
-            return res.get("results", []) or res.get("memories", [])
-        return []
+        if not (res and isinstance(res, dict)):
+            return []
+        results = res.get("results", []) or res.get("memories", [])
+        normalized = []
+        for item in results:
+            if not isinstance(item, dict):
+                continue
+            normalized.append({k.lower(): v for k, v in item.items()})
+        return normalized
