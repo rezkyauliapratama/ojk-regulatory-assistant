@@ -133,9 +133,9 @@ LLM_MODEL=gpt-5.4-mini
 
 ## 5. Quick Start (fresh clone to running app)
 
-Semua command di bawah dijalankan dari folder project
-(`cd ojk-regulatory-assistant`). Ikuti urutannya: tiap step bergantung
-pada step sebelumnya.
+All commands below run from the project root
+(`cd ojk-regulatory-assistant`). Follow the order: each step depends on
+the previous one.
 
 ### Step 1: Clone & configure
 
@@ -143,40 +143,40 @@ pada step sebelumnya.
 git clone https://github.com/rezkyauliapratama/ojk-regulatory-assistant.git
 cd ojk-regulatory-assistant
 
-# buat .env dari template, lalu isi 3 key wajib:
+# create .env from the template, then fill in 3 required keys:
 cp .env.example .env
-# - JINA_API_KEY   (https://jina.ai, gratis 1M token/bulan)
+# - JINA_API_KEY   (https://jina.ai, free tier: 1M tokens/month)
 # - OPENAI_API_KEY (DeepSeek: https://platform.deepseek.com)
-# - APP_PASSWORD   (password login UI, bebas)
+# - APP_PASSWORD   (UI login password, anything you like)
 ```
 
-`.env.example` sudah punya default yang benar (database URL, port,
-NYAWA_BINARY, NYAWA_DB). Kamu cuma perlu mengisi 3 key di atas.
+`.env.example` already ships correct defaults (database URL, ports,
+NYAWA_BINARY, NYAWA_DB). You only need to fill in the 3 keys above.
 
-### Step 2: Setup Nyawa (opsional, tapi recommended)
+### Step 2: Setup Nyawa (optional, but recommended)
 
-Nyawa adalah memory engine bonus (cross-session Q&A recall). Kalau
-skip step ini, semua fitur lain tetap jalan - hanya checkbox memory di
-sidebar yang tidak aktif.
+Nyawa is the bonus memory engine (cross-session Q&A recall). If you
+skip this step, everything else still works - only the memory checkbox
+in the sidebar stays inactive.
 
 ```bash
-# macOS / Linux: build binary + download BGE embedder files otomatis
+# macOS / Linux: build the binary + download BGE embedder files automatically
 bash scripts/setup_nyawa.sh
 
-# Kalau Streamlit jalan di DOCKER (default), pakai flag ini:
-# (build binary LINUX di dalam container golang, biar CGO enabled)
+# If Streamlit runs in DOCKER (the default), use this flag instead:
+# (builds a LINUX binary inside a golang container so CGO stays enabled)
 bash scripts/setup_nyawa.sh --for-docker
 ```
 
-Script ini mengerjakan semuanya: build binary `./nyawa/nyawa` +
-download model all-MiniLM (~23MB) ke `./nyawa/bge/` + verifikasi
-`nyawa version`. Butuh `git` + Go 1.23+ (untuk local) atau Docker
-(untuk `--for-docker`).
+The script does it all: builds `./nyawa/nyawa`, downloads the
+all-MiniLM model (~23MB) into `./nyawa/bge/`, and verifies with
+`nyawa version`. It needs `git` + Go 1.23+ (local mode) or Docker
+(`--for-docker`).
 
-**Penting - jangan cross-compile manual.** Kalau kamu build `GOOS=linux`
-dari macOS tanpa `--for-docker`, Go otomatis set `CGO_ENABLED=0` dan
-binary-nya rusak: `go-sqlite3 requires cgo` + `BGE unavailable`. Detail
-di section 9.
+**Important - do not cross-compile manually.** If you build with
+`GOOS=linux` from macOS without `--for-docker`, Go silently sets
+`CGO_ENABLED=0` and the binary is broken: `go-sqlite3 requires cgo` +
+`BGE unavailable`. See section 9 for details.
 
 ### Step 3: Start infrastructure (Postgres + Grafana + Streamlit)
 
@@ -184,22 +184,22 @@ di section 9.
 docker compose up -d --build
 ```
 
-`--build` wajib di run pertama (Grafana & Streamlit pakai custom
-Dockerfile dengan provisioning/image dependencies). Kalau kamu ubah
-file di `grafana/` atau `Dockerfile`, jalankan lagi dengan `--build`
-biar image ke-rebuild.
+`--build` is required on the first run (Grafana & Streamlit use custom
+Dockerfiles with provisioning/image dependencies). If you change files
+under `grafana/` or the `Dockerfile`, run it again with `--build` so
+the image gets rebuilt.
 
-Verifikasi semua container sehat:
+Verify all containers are healthy:
 
 ```bash
 docker compose ps
-# Nama          Status
+# Name          Status
 # rag-pgvector  Up (healthy)
 # rag-grafana   Up
 # rag-streamlit Up
 ```
 
-### Step 4: Python environment (untuk scripts ingestion)
+### Step 4: Python environment (for the ingestion scripts)
 
 ```bash
 python -m venv .venv
@@ -209,22 +209,23 @@ pip install -r requirements.txt
 
 ### Step 5: Generate chunks & embeddings (one-time)
 
-Folder `data/extracted/`, `data/chunks/`, `data/embeddings/` di-gitignore,
-jadi fresh clone harus build dari PDF yang sudah ada di `data/pdfs/`:
+The folders `data/extracted/`, `data/chunks/`, `data/embeddings/` are
+gitignored, so a fresh clone must build them from the PDFs already
+present in `data/pdfs/`:
 
 ```bash
 python scripts/extract_text.py   # PDFs -> data/extracted/*.txt
 python scripts/chunk.py          # -> data/chunks/*.jsonl (section-based)
-python scripts/embed.py          # -> data/embeddings/*.npy (butuh JINA_API_KEY)
+python scripts/embed.py          # -> data/embeddings/*.npy (needs JINA_API_KEY)
 ```
 
-`embed.py` memanggil Jina API untuk 3,670 chunks. Free tier Jina (1M
-token/bulan) cukup. Ada retry otomatis kalau kena rate limit.
+`embed.py` calls the Jina API for 3,670 chunks. The Jina free tier
+(1M tokens/month) is enough. It retries automatically on rate limits.
 
-### Step 6: Ingest ke Postgres (one-time)
+### Step 6: Ingest into Postgres (one-time)
 
 ```bash
-python scripts/ingest.py         # dlt loads 3,670 chunks ke Postgres
+python scripts/ingest.py         # dlt loads 3,670 chunks into Postgres
 python scripts/setup_vector.py   # vector(1024) + HNSW + FTS indexes
 ```
 
@@ -234,28 +235,28 @@ python scripts/setup_vector.py   # vector(1024) + HNSW + FTS indexes
 python scripts/verify.py
 ```
 
-Harusnya muncul hasil retrieval yang relevan (misal untuk query
-"QRIS"). Kalau error `relation regulatory.regulation_chunks does not
-exist`, berarti Step 6 belum selesai atau gagal.
+You should see relevant retrieval results (e.g. for the query
+"QRIS"). If you get `relation regulatory.regulation_chunks does not
+exist`, Step 6 did not finish or failed.
 
-### Step 8: Buka UI
+### Step 8: Open the UI
 
 ```bash
 streamlit run app/app.py
 open http://localhost:8501
-# login dengan APP_PASSWORD dari .env
+# log in with APP_PASSWORD from .env
 ```
 
-### Run from local (dev mode, tanpa Streamlit container)
+### Run from local (dev mode, no Streamlit container)
 
-Kalau prefer jalanin app langsung di mesin (bukan di container), cuma
-start Postgres + Grafana sebagai infrastruktur:
+If you prefer running the app directly on your machine (not in a
+container), only start Postgres + Grafana as infrastructure:
 
 ```bash
-# 1. Infrastruktur saja (Grafana custom image, wajib --build sekali)
+# 1. Infrastructure only (Grafana custom image, --build once)
 docker compose up -d --build pgvector grafana
 
-# 2. Python env + ingestion (sama seperti Step 4-7 di atas)
+# 2. Python env + ingestion (same as Steps 4-7 above)
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 python scripts/extract_text.py
@@ -265,18 +266,18 @@ python scripts/ingest.py
 python scripts/setup_vector.py
 python scripts/verify.py
 
-# 3. Jalankan UI lokal
+# 3. Run the UI locally
 streamlit run app/app.py --server.port 8501
 ```
 
-**Koneksi database.** App connect via `DATABASE_URL` di `.env`
-(default: `postgresql://rag:rag_password@localhost:5432/rag_db`):
+**Database connection.** The app connects via `DATABASE_URL` in `.env`
+(default: `postgresql://rag:***@localhost:5432/rag_db`):
 
-- **Streamlit di Docker** (`docker compose up -d --build`): compose
-  override `DATABASE_URL` pakai host `pgvector` (nama service). Kamu
-  gak perlu ubah apa pun.
-- **Local dev mode**: pakai host `localhost`. Kalau Postgres jalan di
-  Docker VM remote, pakai `172.17.0.1` (Docker gateway).
+- **Streamlit in Docker** (`docker compose up -d --build`): compose
+  overrides `DATABASE_URL` with host `pgvector` (the service name), so
+  you do not need to change anything.
+- **Local dev mode**: use host `localhost`. If Postgres runs in Docker
+  on a remote VM, use `172.17.0.1` (Docker gateway) instead.
 
 ### Ports
 
@@ -284,19 +285,19 @@ streamlit run app/app.py --server.port 8501
 |---------|------|-----|
 | Streamlit UI | 8501 | http://localhost:8501 |
 | Grafana | 3000 | http://localhost:3000 |
-| PostgreSQL | 5432 | (internal, gak di-expose) |
+| PostgreSQL | 5432 | (internal, not exposed) |
 
 ### Troubleshooting
 
 | Symptom | Fix |
 |---------|-----|
-| `dlt` load stuck / stale state | `dlt pipeline rag_regulations drop-pending-packages`, lalu run ulang `ingest.py` |
-| FTS error `syntax error in tsquery` | Kode lama - `git pull` supaya `fts_query()` sanitize input |
-| `vector(1024)` column missing | Run ulang `python scripts/setup_vector.py` setelah ingest |
-| Jina 429 rate limit | `embed.py` retry otomatis (backoff 10s x attempt) |
+| `dlt` load stuck / stale state | `dlt pipeline rag_regulations drop-pending-packages`, then re-run `ingest.py` |
+| FTS error `syntax error in tsquery` | Old code - `git pull` so `fts_query()` sanitizes input |
+| `vector(1024)` column missing | Re-run `python scripts/setup_vector.py` after ingest |
+| Jina 429 rate limit | `embed.py` retries automatically (backoff 10s x attempt) |
 | Grafana "no data" | `docker exec -i rag-pgvector psql -U rag -d rag_db < scripts/seed_grafana_demo.sql` |
-| Memory toggle gak ada efek | Cek sidebar: warning amber = binary Nyawa missing, jalankan `bash scripts/setup_nyawa.sh --for-docker` lalu `docker compose up -d --build streamlit` |
-| Grafana "Datasource PG was not found" | Image lama - rebuild: `docker compose up -d --build grafana` |
+| Memory toggle has no effect | Check the sidebar: amber warning = Nyawa binary missing, run `bash scripts/setup_nyawa.sh --for-docker` then `docker compose up -d --build streamlit` |
+| Grafana "Datasource PG was not found" | Old image - rebuild: `docker compose up -d --build grafana` |
 
 ### Re-ingest from scratch (re-download PDFs)
 
@@ -310,9 +311,9 @@ python scripts/setup_vector.py   # pgvector + HNSW + FTS indexes
 python scripts/verify.py         # smoke test
 ```
 
-> Kalau DB kena state stale setelah run gagal, reset:
-> `dlt pipeline rag_regulations drop-pending-packages`, lalu
-> `DROP SCHEMA regulatory CASCADE` di Postgres, lalu run ulang.
+> If the DB is in a stale state after a failed run, reset:
+> `dlt pipeline rag_regulations drop-pending-packages`, then
+> `DROP SCHEMA regulatory CASCADE` in Postgres, then re-run.
 
 ## 6. Project Structure
 
@@ -435,7 +436,7 @@ docker exec -i rag-pgvector psql -U rag -d rag_db \
   < scripts/seed_grafana_demo.sql
 ```
 
-Setiap perubahan di `grafana/` butuh rebuild image:
+Any change under `grafana/` requires rebuilding the image:
 
 ```bash
 docker compose up -d --build grafana
@@ -443,7 +444,7 @@ docker compose up -d --build grafana
 
 ## 9. Nyawa Memory Layer (Bonus Feature)
 
-### Apa itu Nyawa?
+### What is Nyawa?
 
 [Nyawa](https://github.com/rezkyauliapratama/nyawa) ("soul" in
 Indonesian) is an **offline-first AI memory engine** written in Go. It
@@ -455,19 +456,19 @@ engine, namespaces, and an MCP server so any AI agent can talk to it.
 go build + one binary -> memory that lasts, no cloud, no Docker, no vector DB
 ```
 
-### Kenapa Nyawa dipakai?
+### Why Nyawa?
 
-- **Cross-session conversation memory** - chat UI menyimpan tiap Q&A
-  pair dan me-recall percakapan terkait, jadi user dapat continuity
-  antar session (checkbox "Use session memory (Nyawa)" di sidebar)
-- **Offline & private** - semua memory ada di file SQLite lokal
-  (`data/nyawa_memory.db`), tidak ada yang keluar dari mesin
-- **Zero infrastructure** - tidak perlu service terpisah, API key, atau
-  network
-- **Bonus rubric point** - menambah *cross-session recall* bonus point
-  (lihat section 10)
-- **Open source** - MIT license, reviewer bisa audit cara kerja memory
-  layer
+- **Cross-session conversation memory** - the chat UI stores every Q&A
+  pair and recalls related past conversations, so users get continuity
+  across sessions (the "Use session memory (Nyawa)" checkbox in the
+  sidebar)
+- **Offline & private** - all memory lives in a local SQLite file
+  (`data/nyawa_memory.db`); nothing leaves the machine
+- **Zero infrastructure** - no separate service, no API key, no network
+- **Bonus rubric point** - adds the *cross-session recall* bonus point
+  (see section 10)
+- **Open source** - MIT license, so reviewers can audit exactly how the
+  memory layer behaves
 
 ### Source
 
@@ -479,36 +480,36 @@ go build + one binary -> memory that lasts, no cloud, no Docker, no vector DB
 | Latest release | v1.0.0 (80 commits, stable) |
 | Build size | ~8.1 MB (single binary) |
 
-### Install - cara termudah: 1 command (recommended)
+### Install - easiest: one command (recommended)
 
 ```bash
-# macOS / Linux, untuk jalan lokal:
+# macOS / Linux, for local runs:
 bash scripts/setup_nyawa.sh
 
-# macOS / Linux, kalau Streamlit jalan di DOCKER (default di project ini):
+# macOS / Linux, if Streamlit runs in DOCKER (this project's default):
 bash scripts/setup_nyawa.sh --for-docker
 ```
 
-Script ini otomatis:
-1. Deteksi OS + architecture (macOS arm64, macOS amd64, Linux arm64,
-   Linux amd64 semua didukung)
-2. Build binary Nyawa v1.0.0 dari source (native build, CGO enabled)
-   - `--for-docker` build di dalam container `golang:1.23` biar
-     binary-nya LINUX (cocok dengan container streamlit)
-3. Download BGE embedder files (bge_server.py + model all-MiniLM ONNX
-   ~23MB dari Hugging Face) ke `./nyawa/bge/`
-4. Verifikasi dengan `nyawa version`
+The script automatically:
+1. Detects your OS + architecture (macOS arm64, macOS amd64, Linux
+   arm64, Linux amd64 are all supported)
+2. Builds the Nyawa v1.0.0 binary from source (native build, CGO
+   enabled)
+   - `--for-docker` builds inside a `golang:1.23` container so the
+     binary is LINUX (matches the streamlit container)
+3. Downloads the BGE embedder files (bge_server.py + all-MiniLM ONNX
+   model, ~23MB from Hugging Face) into `./nyawa/bge/`
+4. Verifies with `nyawa version`
 
-Requirement: `git` + Go 1.23+ untuk local mode; Docker untuk
-`--for-docker`.
+Requires `git` + Go 1.23+ for local mode; Docker for `--for-docker`.
 
-> **Kenapa tidak cross-compile manual?** Kalau kamu build `GOOS=linux`
-> dari macOS, Go otomatis set `CGO_ENABLED=0`. Binary hasilnya rusak:
-> `go-sqlite3 requires cgo to work` dan `BGE unavailable`. Binary harus
-> di-build di OS yang sama dengan tempat app jalan. Itulah yang
-> dilakukan `--for-docker` (build di dalam container Linux). Tanpa
-> Docker, script fallback ke release binary `linux/amd64` (hanya benar
-> kalau container kamu amd64).
+> **Why not cross-compile manually?** If you build with `GOOS=linux`
+> from macOS, Go silently sets `CGO_ENABLED=0`. The resulting binary is
+> broken: `go-sqlite3 requires cgo to work` and `BGE unavailable`. The
+> binary must be built on the same OS where the app runs. That is
+> exactly what `--for-docker` does (build inside a Linux container).
+> Without Docker, the script falls back to the prebuilt `linux/amd64`
+> release binary (only correct if your container is amd64).
 
 ### Install - Option A: download release binary (Linux x86_64 only)
 
@@ -517,54 +518,57 @@ curl -L -o nyawa.gz https://github.com/rezkyauliapratama/nyawa/releases/download
 gunzip nyawa.gz && chmod +x nyawa && mv nyawa ./nyawa/nyawa
 ```
 
-### Install - Option B: build manual dari source (macOS / Linux)
+### Install - Option B: build manually from source (macOS / Linux)
 
-Requires [Go 1.23+](https://go.dev/dl/). Clone tag release `v1.0.0`
-(bukan `main`, biar stable & tested):
+Requires [Go 1.23+](https://go.dev/dl/). Clone the release tag
+`v1.0.0` (not `main`, to get the stable & tested version):
 
 ```bash
 git clone --branch v1.0.0 --depth 1 https://github.com/rezkyauliapratama/nyawa.git
 cd nyawa
 make build                # -> ./nyawa  (uses sqlite_fts5 build tag)
 
-# verifikasi
+# verify
 ./nyawa version           # nyawa v1.0.0
 
-# taruh di tempat yang project ini harapkan
+# place it where this project expects it
 mkdir -p ../ojk-regulatory-assistant/nyawa
 cp nyawa ../ojk-regulatory-assistant/nyawa/nyawa
 ```
 
-### Integrasi ke project (setelah binary + BGE files ada)
+### Integration (once the binary + BGE files are in place)
 
 ```bash
-# 1. .env (default sudah menunjuk ke sini, sesuaikan kalau pindah)
+# 1. .env (defaults already point here, adjust if you moved things)
 NYAWA_BINARY=./nyawa/nyawa
 NYAWA_DB=./data/nyawa_memory.db
 
-# 2. REBUILD streamlit image (wajib - image baru install onnxruntime
-#    & mount folder ./nyawa/bge ke path yang dicari Nyawa)
+# 2. REBUILD the streamlit image (required - the new image installs
+#    onnxruntime & mounts ./nyawa/bge to the path Nyawa looks for)
 docker compose up -d --build streamlit
 
-# 3. Buka UI, centang "Use session memory (Nyawa)" di sidebar
-#    - hijau "Available" = binary + embedder jalan
-#    - amber warning = binary/BGE files belum lengkap
+# 3. Open the UI and tick "Use session memory (Nyawa)" in the sidebar
+#    - green "Available" = binary + embedder working
+#    - amber warning = binary/BGE files incomplete
 ```
 
-**Struktur mount.** Nyawa v1.0.0 hardcode path BGE embedder di
-`/opt/data/nyawa/internal/embedder`. docker-compose.yml mount
-`./nyawa/bge` ke path itu (read-only), jadi file embedder dari host
-langsung terlihat di container. Dockerfile juga install
-`onnxruntime`, `numpy`, `tokenizers` (dependency Python bge_server.py).
+**Mount structure.** Nyawa v1.0.0 hardcodes the BGE embedder path at
+`/opt/data/nyawa/internal/embedder`. docker-compose.yml mounts
+`./nyawa/bge` to that path (read-only), so the embedder files from the
+host are directly visible inside the container. The Dockerfile also
+installs `onnxruntime`, `numpy`, `tokenizers` (Python dependencies of
+bge_server.py).
 
-**Cara kerja.** `app/memory_layer.py` adalah thin MCP-over-stdio
-wrapper: tiap Q&A di-store via `nyawa_store` dan percakapan terkait
-di-recall via `nyawa_recall` di tiap query. Recall metrics (n_results,
-avg/max relevance score) juga di-log ke `regulatory.nyawa_recalls` dan
-tampil di dashboard Grafana (section 8).
+**How it works.** `app/memory_layer.py` is a thin MCP-over-stdio
+wrapper: every Q&A is stored via `nyawa_store` and related past
+conversations are recalled via `nyawa_recall` on every query. Recall
+metrics (n_results, avg/max relevance score) are also logged to
+`regulatory.nyawa_recalls` and shown in the Grafana dashboard
+(section 8).
 
-**Nyawa fully optional.** Tanpa binary, app degrade gracefully -
-checkbox memory tidak ada efek, chat tetap jalan normal.
+**Nyawa is fully optional.** Without the binary, the app degrades
+gracefully - the memory checkbox has no effect and the chat keeps
+working normally.
 
 ## 10. Evaluation Criteria Mapping
 
