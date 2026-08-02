@@ -289,6 +289,9 @@ python scripts/verify.py         # smoke test
 │   ├── provisioning/           # datasource + dashboard provider
 │   └── dashboards/rag-monitoring.json
 ├── nyawa/nyawa             # Nyawa v1.0.0 binary (bonus memory feature)
+├── scripts/
+│   ├── setup_nyawa.sh      # one-command Nyawa installer (see §9)
+│   └── ...                 # fetch/extract/chunk/embed/ingest/verify/eval
 ├── docker-compose.yml      # pgvector + grafana + streamlit
 ├── Dockerfile              # Streamlit app image
 └── requirements.txt        # pinned versions
@@ -401,22 +404,34 @@ go build + one binary -> memory that lasts, no cloud, no Docker, no vector DB
 | Latest release | v1.0.0 (80 commits, stable) |
 | Build size | ~8.1 MB (single binary) |
 
-### Install — Option A: download a release binary (fastest)
+### Install — easiest: one command (recommended)
 
 ```bash
-# Linux x86_64
+bash scripts/setup_nyawa.sh
+```
+
+The script detects your OS + architecture and does the rest:
+- **Linux x86_64** → downloads the official `v1.0.0` release binary
+- **macOS (arm64/amd64)** → clones the `v1.0.0` tag and builds from
+  source (no prebuilt darwin release exists yet)
+- Places the binary at `./nyawa/nyawa`, chmod +x, and verifies with
+  `--version`. Needs `git` + Go 1.23+ on macOS, `curl` on Linux.
+
+### Install — Option A: download a release binary (Linux x86_64)
+
+```bash
 curl -L -o nyawa.gz https://github.com/rezkyauliapratama/nyawa/releases/download/v1.0.0/nyawa-linux-amd64.gz
 gunzip nyawa.gz && chmod +x nyawa && mv nyawa ./nyawa/nyawa
-
-# macOS (arm64) — build from source (no prebuilt darwin release yet), see Option B
 ```
 
 ### Install — Option B: build from source (macOS / any platform)
 
-Requires [Go 1.23+](https://go.dev/dl/).
+Requires [Go 1.23+](https://go.dev/dl/). Cloning a specific release
+tag works the same as cloning `main` — checkout `v1.0.0` for the
+stable, tested version:
 
 ```bash
-git clone https://github.com/rezkyauliapratama/nyawa.git
+git clone --branch v1.0.0 --depth 1 https://github.com/rezkyauliapratama/nyawa.git
 cd nyawa
 make build                # -> ./nyawa  (uses sqlite_fts5 build tag)
 
