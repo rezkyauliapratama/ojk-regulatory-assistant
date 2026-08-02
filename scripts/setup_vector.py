@@ -24,11 +24,11 @@ def main() -> int:
     cur = conn.cursor()
 
     cur.execute("CREATE EXTENSION IF NOT EXISTS vector")
-    cur.execute("ALTER TABLE ojk.regulation_chunks ADD COLUMN IF NOT EXISTS embedding vector(%d)" % DIM)
+    cur.execute("ALTER TABLE regulatory.regulation_chunks ADD COLUMN IF NOT EXISTS embedding vector(%d)" % DIM)
 
     # JSON string -> float[] -> vector
     cur.execute("""
-        UPDATE ojk.regulation_chunks
+        UPDATE regulatory.regulation_chunks
         SET embedding = (embedding_json::jsonb)::text::vector
         WHERE embedding IS NULL AND embedding_json IS NOT NULL
     """)
@@ -36,27 +36,27 @@ def main() -> int:
 
     cur.execute("""
         CREATE INDEX IF NOT EXISTS idx_chunks_embedding
-        ON ojk.regulation_chunks USING hnsw (embedding vector_cosine_ops)
+        ON regulatory.regulation_chunks USING hnsw (embedding vector_cosine_ops)
     """)
     print("HNSW cosine index created")
 
     # FTS index for hybrid search (Bahasa Indonesia config if available)
     cur.execute("""
-        ALTER TABLE ojk.regulation_chunks
+        ALTER TABLE regulatory.regulation_chunks
         ADD COLUMN IF NOT EXISTS text_tsv tsvector
     """)
     cur.execute("""
-        UPDATE ojk.regulation_chunks
+        UPDATE regulatory.regulation_chunks
         SET text_tsv = to_tsvector('simple', coalesce(text, ''))
         WHERE text_tsv IS NULL
     """)
     cur.execute("""
         CREATE INDEX IF NOT EXISTS idx_chunks_fts
-        ON ojk.regulation_chunks USING gin (text_tsv)
+        ON regulatory.regulation_chunks USING gin (text_tsv)
     """)
     print("FTS tsvector + GIN index created")
 
-    cur.execute("SELECT count(*) FROM ojk.regulation_chunks WHERE embedding IS NOT NULL")
+    cur.execute("SELECT count(*) FROM regulatory.regulation_chunks WHERE embedding IS NOT NULL")
     n = cur.fetchone()[0]
     print(f"Chunks with embeddings: {n}")
 

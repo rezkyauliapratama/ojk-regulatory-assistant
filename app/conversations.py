@@ -20,7 +20,7 @@ ROOT = HERE.parent
 load_dotenv(ROOT / ".env")
 
 SCHEMA = """
-CREATE TABLE IF NOT EXISTS ojk.conversations (
+CREATE TABLE IF NOT EXISTS regulatory.conversations (
     id SERIAL PRIMARY KEY,
     query TEXT NOT NULL,
     rewritten_query TEXT,
@@ -59,7 +59,7 @@ def log_conversation(
     cur = conn.cursor()
     cur.execute(
         """
-        INSERT INTO ojk.conversations
+        INSERT INTO regulatory.conversations
             (query, rewritten_query, answer, prompt_version, model, docs, usage_tokens, feedback)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         RETURNING id
@@ -87,7 +87,7 @@ def set_feedback(conv_id: int, feedback: str) -> None:
     conn.autocommit = True
     cur = conn.cursor()
     cur.execute(
-        "UPDATE ojk.conversations SET feedback = %s WHERE id = %s",
+        "UPDATE regulatory.conversations SET feedback = %s WHERE id = %s",
         (feedback, conv_id),
     )
     cur.close()

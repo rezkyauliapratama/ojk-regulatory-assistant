@@ -76,8 +76,8 @@ full manifest with source URLs is in `data/sources.yaml`.
                                     │
                     ┌───────────────▼──────────────────────────────┐
                     │          PostgreSQL (pgvector)               │
-                    │  ojk.regulation_chunks (3,670 chunks)        │
-                    │  ojk.conversations (Q&A log + feedback)      │
+                    │  regulatory.regulation_chunks (3,670 chunks)   │
+                    │  regulatory.conversations (Q&A log + feedback) │
                     └───────────────┬──────────────────────────────┘
                                     │
             ┌───────────────────────┴───────────────────────┐
@@ -191,7 +191,7 @@ streamlit run app/app.py --server.port 8501
 ```
 
 The app connects to Postgres via `DATABASE_URL` in `.env` (default:
-`postgresql://ojk:change_me@localhost:5432/ojk_regulatory`). If your
+`postgresql://rag:change_me@localhost:5432/rag_db`). If your
 Postgres runs in Docker, use host `172.17.0.1` (Docker gateway) instead
 of `localhost` — see `DATABASE_URL` in `.env`.
 
@@ -207,11 +207,11 @@ of `localhost` — see `DATABASE_URL` in `.env`.
 
 | Symptom | Fix |
 |---------|-----|
-| `dlt` load stuck / stale state | `dlt pipeline ojk_regulations drop-pending-packages`, then re-run `ingest.py` |
+| `dlt` load stuck / stale state | `dlt pipeline rag_regulations drop-pending-packages`, then re-run `ingest.py` |
 | FTS query error `syntax error in tsquery` | Only happens with old code — pull latest (`git pull`) so `fts_query()` sanitizes input |
 | `vector(1024)` column missing | Re-run `python scripts/setup_vector.py` after ingest |
 | Jina 429 rate limit | `embed.py` retries with backoff automatically (10s×attempt) |
-| Grafana shows "no data" | Run `docker exec -i ojk-pgvector psql -U ojk -d ojk_regulatory < scripts/seed_grafana_demo.sql` |
+| Grafana shows "no data" | Run `docker exec -i rag-pgvector psql -U rag -d rag_db < scripts/seed_grafana_demo.sql` |
 | Memory toggle does nothing | Nyawa binary missing — check `nyawa/nyawa` exists, or it degrades gracefully (app still works) |
 
 ### Re-ingest from scratch (re-download PDFs)
@@ -227,8 +227,8 @@ python scripts/verify.py         # smoke test
 ```
 
 > If you hit a stale DB state after a failed run, reset:
-> `dlt pipeline ojk_regulations drop-pending-packages` then
-> `DROP SCHEMA ojk CASCADE` in Postgres, then re-run.
+> `dlt pipeline rag_regulations drop-pending-packages` then
+> `DROP SCHEMA regulatory CASCADE` in Postgres, then re-run.
 
 ## 6. Project Structure
 
@@ -265,7 +265,7 @@ python scripts/verify.py         # smoke test
 ├── grafana/
 │   ├── Dockerfile              # custom image with provisioning baked in
 │   ├── provisioning/           # datasource + dashboard provider
-│   └── dashboards/ojk-monitoring.json
+│   └── dashboards/rag-monitoring.json
 ├── nyawa/nyawa             # Nyawa v1.0.0 binary (bonus memory feature)
 ├── docker-compose.yml      # pgvector + grafana + streamlit
 ├── Dockerfile              # Streamlit app image
@@ -322,9 +322,9 @@ python scripts/eval_llm.py --sample 30
 
 ## 8. Monitoring (Grafana)
 
-The Grafana dashboard **"OJK RAG Monitoring"** is provisioned automatically
+The Grafana dashboard **"RAG Monitoring"** is provisioned automatically
 (custom image, `grafana/`). It has **6 charts** fed by the
-`ojk.conversations` table (every chat interaction + 👍/👎 feedback):
+`regulatory.conversations` table (every chat interaction + 👍/👎 feedback):
 
 1. Pertanyaan per Hari — queries per day (time series)
 2. Total Pertanyaan — total count (stat)
@@ -337,7 +337,7 @@ Open `http://localhost:3000` (admin / GRAFANA_PASSWORD from `.env`). To see
 data immediately, seed the demo set:
 
 ```bash
-docker exec -i ojk-pgvector psql -U ojk -d ojk_regulatory \
+docker exec -i rag-pgvector psql -U rag -d rag_db \
   < scripts/seed_grafana_demo.sql
 ```
 

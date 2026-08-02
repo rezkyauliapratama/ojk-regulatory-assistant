@@ -47,9 +47,9 @@ def chunks_resource():
 
 def main() -> int:
     pipeline = dlt.pipeline(
-        pipeline_name="ojk_regulations",
+        pipeline_name="rag_regulations",
         destination=dlt.destinations.postgres(os.environ["DATABASE_URL"]),
-        dataset_name="ojk",
+        dataset_name="regulatory",
     )
     load_info = pipeline.run(chunks_resource())
     print(load_info)

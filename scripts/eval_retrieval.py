@@ -64,7 +64,7 @@ class EvalSearch:
         vec_str = "[" + ",".join(f"{v:.6f}" for v in vec) + "]"
         cur = self.conn.cursor()
         cur.execute(
-            "SELECT chunk_id FROM ojk.regulation_chunks "
+            "SELECT chunk_id FROM regulatory.regulation_chunks "
             "WHERE embedding IS NOT NULL ORDER BY embedding <=> %s::vector LIMIT %s",
             (vec_str, k),
         )
@@ -76,7 +76,7 @@ class EvalSearch:
         tq = fts_query(query)
         cur = self.conn.cursor()
         cur.execute(
-            "SELECT chunk_id FROM ojk.regulation_chunks "
+            "SELECT chunk_id FROM regulatory.regulation_chunks "
             "WHERE text_tsv @@ to_tsquery('simple', %s) "
             "ORDER BY ts_rank(text_tsv, to_tsquery('simple', %s)) DESC LIMIT %s",
             (tq, tq, k),
