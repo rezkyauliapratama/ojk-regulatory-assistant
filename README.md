@@ -411,18 +411,20 @@ bash scripts/setup_nyawa.sh              # local run (macOS/Linux host)
 bash scripts/setup_nyawa.sh --for-docker # Docker container (Linux binary)
 ```
 
-The script detects your OS + architecture and does the rest:
-- **Linux x86_64 (host)** → downloads the official `v1.0.0` release binary
-- **macOS (arm64/amd64)** → clones the `v1.0.0` tag and builds from
-  source (no prebuilt darwin release exists yet)
-- Places the binary at `./nyawa/nyawa`, chmod +x, and verifies with
-  `--version`. Needs `git` + Go 1.23+ on macOS, `curl` on Linux.
+The script installs a **working** binary and verifies it:
+- **Local run** → builds from source natively (CGO stays enabled, which
+  go-sqlite3 and the BGE embedder require)
+- **`--for-docker`** → builds inside a `golang:1.23` Docker container so
+  the Linux binary is compiled **on Linux with CGO enabled**, then copies
+  it to `./nyawa/nyawa`
 
-> **Platform match matters.** The binary must run where Streamlit runs.
-> If you run Streamlit **in Docker** (the default in §5), the container
-> is Linux — pass `--for-docker` so a Linux binary is built; a macOS
-> binary will not execute inside the container. If you run Streamlit
-> **locally on your Mac**, use no flag (darwin binary).
+> **Why not cross-compile?** Building with `GOOS=linux` on macOS silently
+> sets `CGO_ENABLED=0`, which produces a broken binary that fails with
+> `go-sqlite3 requires cgo to work` and `BGE unavailable`. The binary
+> must be built on the same OS the app runs on — that is exactly what
+> `--for-docker` does (build inside a Linux container). Requires Docker;
+> without it the script falls back to the prebuilt `linux/amd64` release
+> binary (only correct if your container is amd64).
 
 ### Install — Option A: download a release binary (Linux x86_64)
 
