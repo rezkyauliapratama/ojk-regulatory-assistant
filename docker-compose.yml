@@ -52,6 +52,7 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-rag}:${POSTGRES_PASSWORD:-change_me}@pgvector:5432/${POSTGRES_DB:-rag_db}
     volumes:
       - ./data:/app/data
+      - ./nyawa:/app/nyawa:ro
     depends_on:
       pgvector:
         condition: service_healthy

@@ -20,8 +20,14 @@ ROOT = HERE.parent
 
 class MemoryLayer:
     def __init__(self, binary: str | None = None, db: str | None = None) -> None:
-        self.binary = binary or os.environ.get("NYAWA_BINARY", str(ROOT / "nyawa" / "nyawa"))
-        self.db = db or os.environ.get("NYAWA_DB", str(ROOT / "data" / "nyawa_memory.db"))
+        # Resolve relative paths against the project root (ROOT), not the
+        # current working directory — streamlit's CWD differs in Docker.
+        def _resolve(p: str) -> pathlib.Path:
+            path = pathlib.Path(p)
+            return path if path.is_absolute() else ROOT / path
+
+        self.binary = str(_resolve(binary or os.environ.get("NYAWA_BINARY", "nyawa/nyawa")))
+        self.db = str(_resolve(db or os.environ.get("NYAWA_DB", "data/nyawa_memory.db")))
         self.available = pathlib.Path(self.binary).exists()
 
     def _call(self, method: str, params: dict) -> dict | None:
