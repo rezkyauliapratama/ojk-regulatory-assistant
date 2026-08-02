@@ -152,7 +152,8 @@ cp .env.example .env            # fill in: JINA_API_KEY, OPENAI_API_KEY, APP_PAS
 #    (first run or after any change to grafana/ or Dockerfile):
 docker compose up -d --build
 
-# 3. Install Python deps (Python 3.11+)
+# 3. Create venv & install Python deps (Python 3.11+)
+python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
 # 4. Ingest regulations (PDFs already in data/pdfs/ — no download needed)
