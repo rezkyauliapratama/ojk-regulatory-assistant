@@ -292,6 +292,8 @@ def main() -> None:
         if use_memory:
             if memory.available:
                 st.success(f"🧠 {tr('memory_available', lang)}")
+            elif memory.error:
+                st.warning(f"🧠 {tr('memory_missing', lang, path=memory.binary)}\n\n{memory.error}")
             else:
                 st.warning(tr("memory_missing", lang, path=str(memory.binary)))
         if st.button(tr("logout", lang)):
@@ -333,7 +335,7 @@ def main() -> None:
                 # optional memory: store Q&A + show related past Q&A
                 memory = get_memory()
                 if use_memory and memory.available:
-                    memory.store(
+                    mem_id = memory.store(
                         content=f"Q: {query}\nA: {answer_text[:500]}",
                         namespace="rag_qa",
                         type_="chat",
@@ -345,10 +347,14 @@ def main() -> None:
                             c = r.get("content", "")
                             if c:
                                 st.markdown(f"- {c[:300]}")
+                    elif memory.last_error:
+                        st.caption(f"⚠️ {memory.last_error}")
                     else:
                         st.caption(tr("memory_empty", lang))
                     # log recall metrics to Postgres for Grafana (best-effort)
                     log_nyawa_recall(query, related)
+                    if mem_id is None and memory.last_error:
+                        st.caption(f"⚠️ store failed: {memory.last_error}")
 
                 st.markdown(answer_text)
                 if docs:
