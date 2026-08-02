@@ -15,6 +15,8 @@ data/extracted/
 data/chunks/
 data/nyawa_memory.db*
 data/nyawa_memory.db.hnsw
+# Nyawa BGE embedder support files (downloaded by setup_nyawa.sh, ~23MB)
+nyawa/bge/
 *.duckdb
 *.db
 

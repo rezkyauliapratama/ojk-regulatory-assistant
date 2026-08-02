@@ -53,6 +53,9 @@ services:
     volumes:
       - ./data:/app/data
       - ./nyawa:/app/nyawa:ro
+      # nyawa v1.0.0 hardcodes /opt/data/nyawa/internal/embedder for its BGE
+      # embedder (bge_server.py + ONNX model) — mounted from ./nyawa/bge/
+      - ./nyawa/bge:/opt/data/nyawa/internal/embedder:ro
     depends_on:
       pgvector:
         condition: service_healthy

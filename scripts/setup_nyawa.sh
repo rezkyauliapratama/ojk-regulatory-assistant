@@ -23,10 +23,39 @@
 # the optional prebuilt-binary fast path (linux/amd64 only).
 set -euo pipefail
 
+# bge_server.py: bundled in this repo at scripts/bge_server.py. The
+# version on GitHub (both tag v1.0.0 and main) is a 62-line minified copy
+# that does not pass token_type_ids and returns empty embeddings with the
+# all-MiniLM ONNX model. The bundled 152-line version works (validated).
 REPO_URL="https://github.com/rezkyauliapratama/nyawa.git"
 RELEASE_TAG="v1.0.0"
-DEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/nyawa"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Model: all-MiniLM-L6-v2 ONNX (same model nyawa expects at
+# /opt/data/nyawa/internal/embedder/model). Not committed to the GitHub
+# repo, so we fetch the quantized ONNX export from Hugging Face
+# (model_qint8_arm64.onnx ≈23MB; the fp32 model.onnx is 90MB).
+HF_BASE="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main"
+DEST_DIR="$(cd "$SCRIPT_DIR/.." && pwd)/nyawa"
 DEST_BIN="$DEST_DIR/nyawa"
+
+# fetch_bge: installs the BGE embedder support files that nyawa v1.0.0
+# requires at a HARDCODED path (/opt/data/nyawa/internal/embedder):
+# bge_server.py + the ONNX model dir. Without them the embedder chain is
+# empty and store/recall silently fail ("BGE unavailable").
+fetch_bge() {
+  local bge_dir="$DEST_DIR/bge"
+  mkdir -p "$bge_dir/model"
+  echo "==> Installing BGE embedder support files (bge_server.py + ONNX model)..."
+  cp "$SCRIPT_DIR/bge_server.py" "$bge_dir/bge_server.py" || { echo "WARN: bge_server.py copy failed"; return 1; }
+  # quantized 23MB export (same model validated in dev); falls back to fp32 90MB
+  if ! curl -fsSL "$HF_BASE/onnx/model_qint8_arm64.onnx" -o "$bge_dir/model/model.onnx"; then
+    curl -fsSL "$HF_BASE/onnx/model.onnx" -o "$bge_dir/model/model.onnx" || { echo "WARN: model download failed"; return 1; }
+  fi
+  for f in tokenizer.json config.json tokenizer_config.json special_tokens_map.json; do
+    curl -fsSL "$HF_BASE/$f" -o "$bge_dir/model/$f" || { echo "WARN: $f download failed"; return 1; }
+  done
+  echo "==> BGE support files ready at $bge_dir"
+}
 
 FOR_DOCKER=0
 [[ "${1:-}" == "--for-docker" ]] && FOR_DOCKER=1
@@ -95,6 +124,10 @@ fi
 
 echo "==> Verifying..."
 "$DEST_BIN" version || true
+
+# BGE embedder support files (needed by the container; also fine locally)
+fetch_bge || true
+
 echo "==> Done! Nyawa installed at $DEST_BIN"
 echo "    .env defaults already point here (NYAWA_BINARY=./nyawa/nyawa)."
 echo "    Restart Streamlit and tick 'Use session memory (Nyawa)' in the sidebar."
