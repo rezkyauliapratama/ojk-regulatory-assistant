@@ -18,6 +18,7 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
 import streamlit as st
+import yaml
 
 from conversations import init_db, log_conversation, set_feedback
 from llm_flow import answer, translate_docs
@@ -25,6 +26,7 @@ from memory_layer import MemoryLayer
 from rag_engine import RagEngine
 
 APP_PASSWORD = os.environ.get("APP_PASSWORD", "admin")
+ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 # ---------------------------------------------------------------- i18n
 T = {
@@ -58,6 +60,18 @@ T = {
         "feedback_noted": "Feedback recorded, we will improve.",
         "original_note": "Original (Indonesian): {text}",
         "logged_out": "You have been logged out.",
+        "kb_expander": "📚 Knowledge Base ({n} regulations)",
+        "kb_intro": "The assistant answers from these OJK/BI regulations:",
+        "kb_cat_ai": "AI / Technology",
+        "kb_cat_payment": "Payment Systems",
+        "kb_cat_banking": "Banking",
+        "kb_cat_other": "Other",
+        "memory_title": "🧠 Session memory (Nyawa)",
+        "memory_available": "Available",
+        "memory_missing": "Not available — Nyawa binary not found at `{path}`. Download it from github.com/rezkyauliapratama/nyawa/releases and place it in `nyawa/nyawa`.",
+        "memory_related": "🧠 Related past conversations:",
+        "memory_empty": "No related past conversations found yet — start chatting and past Q&A will be recalled here.",
+        "memory_stored": "Q&A stored to memory.",
     },
     "id": {
         "page_title": "Asisten Intelijen Regulasi",
@@ -89,6 +103,18 @@ T = {
         "feedback_noted": "Feedback dicatat, kami akan perbaiki.",
         "original_note": "Asli (Bahasa Indonesia): {text}",
         "logged_out": "Kamu telah keluar.",
+        "kb_expander": "📚 Basis Pengetahuan ({n} regulasi)",
+        "kb_intro": "Asisten menjawab dari regulasi OJK/BI berikut:",
+        "kb_cat_ai": "AI / Teknologi",
+        "kb_cat_payment": "Sistem Pembayaran",
+        "kb_cat_banking": "Perbankan",
+        "kb_cat_other": "Lainnya",
+        "memory_title": "🧠 Memori sesi (Nyawa)",
+        "memory_available": "Tersedia",
+        "memory_missing": "Tidak tersedia — binary Nyawa tidak ditemukan di `{path}`. Unduh dari github.com/rezkyauliapratama/nyawa/releases dan letakkan di `nyawa/nyawa`.",
+        "memory_related": "🧠 Percakapan terkait sebelumnya:",
+        "memory_empty": "Belum ada percakapan terkait — mulai ngobrol dan Q&A sebelumnya akan muncul di sini.",
+        "memory_stored": "Q&A tersimpan ke memori.",
     },
 }
 
@@ -126,6 +152,48 @@ def get_engine() -> RagEngine:
 @st.cache_resource
 def get_memory() -> MemoryLayer:
     return MemoryLayer()
+
+
+@st.cache_resource
+def get_sources() -> list[dict]:
+    """Load the regulation manifest from data/sources.yaml."""
+    path = ROOT / "data" / "sources.yaml"
+    if not path.exists():
+        return []
+    with open(path, encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    return data.get("documents", [])
+
+
+CATEGORY_LABEL = {
+    "ai": "kb_cat_ai",
+    "payment": "kb_cat_payment",
+    "banking": "kb_cat_banking",
+}
+
+
+def render_kb(lang: str) -> None:
+    """Show which documents the RAG knowledge base contains."""
+    docs = get_sources()
+    if not docs:
+        return
+    with st.expander(tr("kb_expander", lang, n=len(docs))):
+        st.write(tr("kb_intro", lang))
+        by_cat: dict[str, list[dict]] = {}
+        for d in docs:
+            cat = d.get("category", "other")
+            by_cat.setdefault(cat, []).append(d)
+        for cat, items in by_cat.items():
+            label_key = CATEGORY_LABEL.get(cat, "kb_cat_other")
+            st.markdown(f"**{tr(label_key, lang)}**")
+            for d in items:
+                title = d.get("title", "")
+                number = d.get("number", "")
+                year = d.get("year", "")
+                label = f"{number} — {title}" if number else title
+                if year:
+                    label += f" ({year})"
+                st.markdown(f"- {label}")
 
 
 @st.cache_data(show_spinner=False)
@@ -219,9 +287,19 @@ def main() -> None:
             format_func=lambda x: T[lang]["prompt_v1"] if x == "v1" else T[lang]["prompt_v2"],
         )
         use_memory = st.checkbox(tr("sidebar_memory", lang), value=False)
+        # memory availability status
+        memory = get_memory()
+        if use_memory:
+            if memory.available:
+                st.success(f"🧠 {tr('memory_available', lang)}")
+            else:
+                st.warning(tr("memory_missing", lang, path=str(memory.binary)))
         if st.button(tr("logout", lang)):
             st.session_state.authed = False
             st.rerun()
+
+    # knowledge base scope info
+    render_kb(lang)
 
     # chat history
     if "messages" not in st.session_state:
@@ -250,7 +328,6 @@ def main() -> None:
                     docs, conv_id = [], None
 
                 # optional memory: store Q&A + show related past Q&A
-                memory_note = ""
                 memory = get_memory()
                 if use_memory and memory.available:
                     memory.store(
@@ -260,9 +337,15 @@ def main() -> None:
                     )
                     related = memory.recall(query)
                     if related:
-                        memory_note = f"\n\n{tr('memory_note', lang, n=len(related))}"
+                        st.markdown(f"**{tr('memory_related', lang)}**")
+                        for r in related[:3]:
+                            c = r.get("content", "")
+                            if c:
+                                st.markdown(f"- {c[:300]}")
+                    else:
+                        st.caption(tr("memory_empty", lang))
 
-                st.markdown(answer_text + memory_note)
+                st.markdown(answer_text)
                 if docs:
                     render_citation(docs, lang)
                     render_feedback(conv_id, lang)
