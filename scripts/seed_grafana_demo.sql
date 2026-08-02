@@ -1,5 +1,5 @@
 -- Seed demo data for Grafana dashboard verification
-INSERT INTO ojk.conversations (query, answer, prompt_version, model, docs, usage_tokens, feedback, created_at) VALUES
+INSERT INTO regulatory.conversations (query, answer, prompt_version, model, docs, usage_tokens, feedback, created_at) VALUES
 ('Apa itu QRIS?', 'QRIS adalah standar kode QR pembayaran Indonesia.', 'v1', 'gpt-5.4-mini', '[{"doc_id":"PADG_3_2025_QRIS_TUNTAS"}]', 1200, 'up', now() - interval '6 days'),
 ('Kewajiban bank AI?', 'Bank wajib menerapkan tata kelola AI.', 'v1', 'gpt-5.4-mini', '[{"doc_id":"OJK_AI_Governance_Banking_2025"}]', 4052, 'up', now() - interval '5 days'),
 ('Keamanan siber bank?', 'Bank wajib menerapkan keamanan siber.', 'v1', 'gpt-5.4-mini', '[{"doc_id":"SEOJK_29_2022_Keamanan_Siber_Bank_Umum"}]', 3671, 'up', now() - interval '4 days'),

@@ -125,7 +125,7 @@ class HybridSearch:
         cur.execute(
             """
             SELECT chunk_id, (embedding <=> %s::vector) AS dist
-            FROM ojk.regulation_chunks
+            FROM regulatory.regulation_chunks
             WHERE embedding IS NOT NULL
             ORDER BY embedding <=> %s::vector
             LIMIT %s
@@ -142,7 +142,7 @@ class HybridSearch:
         cur.execute(
             """
             SELECT chunk_id, ts_rank(text_tsv, to_tsquery('simple', %s)) AS score
-            FROM ojk.regulation_chunks
+            FROM regulatory.regulation_chunks
             WHERE text_tsv @@ to_tsquery('simple', %s)
             ORDER BY score DESC
             LIMIT %s
@@ -175,7 +175,7 @@ class HybridSearch:
         cur.execute(
             """
             SELECT chunk_id, doc_id, pasal, ayat, text
-            FROM ojk.regulation_chunks
+            FROM regulatory.regulation_chunks
             WHERE chunk_id = ANY(%s)
             """,
             (chunk_ids,),

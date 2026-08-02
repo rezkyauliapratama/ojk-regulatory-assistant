@@ -1,17 +1,17 @@
 services:
   pgvector:
     image: pgvector/pgvector:pg16
-    container_name: ojk-pgvector
+    container_name: rag-pgvector
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-ojk_regulatory}
-      POSTGRES_USER: ${POSTGRES_USER:-ojk}
+      POSTGRES_DB: ${POSTGRES_DB:-rag_db}
+      POSTGRES_USER: ${POSTGRES_USER:-rag}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me}
     ports:
       - "5432:5432"
     volumes:
       - pgvector_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ojk} -d ${POSTGRES_DB:-ojk_regulatory}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-rag} -d ${POSTGRES_DB:-rag_db}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -20,16 +20,16 @@ services:
     build:
       context: ./grafana
       dockerfile: Dockerfile
-    image: ojk-grafana
-    container_name: ojk-grafana
+    image: rag-grafana
+    container_name: rag-grafana
     ports:
       - "3000:3000"
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
-      POSTGRES_USER: ${POSTGRES_USER:-ojk}
+      POSTGRES_USER: ${POSTGRES_USER:-rag}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me}
-      POSTGRES_DB: ${POSTGRES_DB:-ojk_regulatory}
+      POSTGRES_DB: ${POSTGRES_DB:-rag_db}
     volumes:
       - grafana_data:/var/lib/grafana
     depends_on:
@@ -40,7 +40,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ojk-streamlit
+    container_name: rag-streamlit
     ports:
       - "8501:8501"
     env_file:
