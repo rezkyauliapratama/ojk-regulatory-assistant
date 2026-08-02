@@ -7,7 +7,7 @@ pymupdf==1.28.0
 sentence-transformers==5.6.1
 python-dotenv==1.2.2
 pandas==3.0.5
-numpy==2.5.1
+numpy==2.4.6
 openai>=1.50
 requests>=2.31
 pyyaml>=6.0
