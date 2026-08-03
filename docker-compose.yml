@@ -27,6 +27,11 @@ services:
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      # Grafana di-serve di subpath /grafana via HTTPS LB path routing.
+      # WAJIB: root_url + serve_from_sub_path, kalau tidak redirect ke /login
+      # (root) dan gak pernah sampai ke login page yang benar.
+      GF_SERVER_ROOT_URL: https://banking-comp-assistant.rezkyaulia.dev/grafana/
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
       POSTGRES_USER: ${POSTGRES_USER:-rag}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me}
       POSTGRES_DB: ${POSTGRES_DB:-rag_db}
