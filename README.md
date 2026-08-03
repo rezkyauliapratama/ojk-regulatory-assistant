@@ -426,7 +426,7 @@ python scripts/verify.py         # smoke test
 │       └── llm_eval.json        # judge scores per prompt version
 ├── docs/
 │   ├── sample-questions.md # 10 bilingual sample questions + tips
-│   └── screenshots/        # 6 app screenshots (login, UI, memory recall)
+│   └── screenshots/        # 7 screenshots (app UI + Grafana dashboard)
 ├── grafana/
 │   ├── Dockerfile              # custom image with provisioning baked in
 │   ├── provisioning/           # datasource + dashboard provider
@@ -505,6 +505,8 @@ and `regulatory.nyawa_recalls` (memory metrics):
   answer preview, prompt version, model, tokens, feedback, cited docs
 - Nyawa Avg Relevance, Nyawa Recall Relevance over Time, Nyawa Recall
   Results per Query (memory metrics)
+
+![Grafana RAG Monitoring dashboard](docs/screenshots/07-grafana-monitoring.png)
 
 Open `http://localhost:3000` (admin / GRAFANA_PASSWORD from `.env`).
 To see data immediately, seed the demo set:
