@@ -66,10 +66,7 @@ services:
     depends_on:
       pgvector:
         condition: service_healthy
-    # Behind HTTPS LB: CORS/XSRF dimatikan karena Origin/Host berbeda di proxy.
-    # enableCORS=false + enableXsrfProtection=false = rekomendasi resmi Streamlit
-    # untuk deploy di belakang reverse proxy / load balancer.
-    command: ["streamlit", "run", "app/app.py", "--server.port=8501", "--server.address=0.0.0.0", "--server.enableCORS=false", "--server.enableXsrfProtection=false"]
+    command: ["streamlit", "run", "app/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
 
 volumes:
   pgvector_data:
