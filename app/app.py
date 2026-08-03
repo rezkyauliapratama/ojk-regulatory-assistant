@@ -236,13 +236,15 @@ def run_query(query: str, version: str, lang: str) -> tuple[str, list[dict], int
     return result["answer"], docs, conv_id
 
 
-def render_citation(docs: list[dict], lang: str) -> None:
+def render_citation(docs: list[dict], lang: str, key_suffix: str = "x") -> None:
     st.subheader(tr("sources", lang, n=len(docs)))
     texts = [d["text"] for d in docs]
     translated = translated_texts(texts, lang)
     for i, d in enumerate(docs, 1):
         pasal = f"{tr('article', lang)} {d['pasal']}" if d.get("pasal") else tr("general", lang)
-        with st.expander(f"{i}. {d['doc_id']} — {pasal}"):
+        # unique key per (message, source) - two answers citing the same
+        # doc+pasal must not share an expander key or Streamlit drops them
+        with st.expander(f"{i}. {d['doc_id']} — {pasal}", key=f"src_{key_suffix}_{i}"):
             st.write(translated[i - 1] if lang == "en" else d["text"])
             if lang == "en" and translated[i - 1] != d["text"]:
                 st.caption(tr("original_note", lang, text=d["text"][:200] + ("..." if len(d["text"]) > 200 else "")))
@@ -326,12 +328,14 @@ def main() -> None:
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    for msg in st.session_state.messages:
+    for msg_idx, msg in enumerate(st.session_state.messages):
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
             if msg["role"] == "assistant":
                 if msg.get("docs"):
-                    render_citation(msg["docs"], msg.get("lang", lang))
+                    # unique suffix per message so repeated answers with the
+                    # same cited doc+pasal do not collide on expander keys
+                    render_citation(msg["docs"], msg.get("lang", lang), key_suffix=str(msg.get("conv_id") or f"h{msg_idx}"))
                 if msg.get("conv_id"):
                     render_feedback(msg["conv_id"], msg.get("lang", lang))
 
@@ -348,6 +352,7 @@ def main() -> None:
             st.markdown(query)
 
         with st.chat_message("assistant"):
+            related: list[dict] = []
             with st.spinner(tr("searching", lang)):
                 try:
                     answer_text, docs, conv_id = run_query(query, version, lang)
@@ -364,25 +369,28 @@ def main() -> None:
                         type_="chat",
                     )
                     related = memory.recall(query, namespace="rag_qa")
-                    if related:
-                        st.markdown(f"**{tr('memory_related', lang)}**")
-                        for r in related[:3]:
-                            c = r.get("content", "")
-                            if c:
-                                st.markdown(f"- {c[:300]}")
-                    elif memory.last_error:
-                        st.caption(f"⚠️ {memory.last_error}")
-                    else:
-                        st.caption(tr("memory_empty", lang))
-                    # log recall metrics to Postgres for Grafana (best-effort)
-                    log_nyawa_recall(query, related)
                     if mem_id is None and memory.last_error:
                         st.caption(f"⚠️ store failed: {memory.last_error}")
+                    # log recall metrics to Postgres for Grafana (best-effort)
+                    log_nyawa_recall(query, related)
 
-                st.markdown(answer_text)
-                if docs:
-                    render_citation(docs, lang)
-                    render_feedback(conv_id, lang)
+            # render answer + related OUTSIDE the spinner block: content
+            # placed inside st.spinner can be cleared when the spinner ends
+            if use_memory and memory.available:
+                if related:
+                    st.markdown(f"**{tr('memory_related', lang)}**")
+                    for r in related[:3]:
+                        c = r.get("content", "")
+                        if c:
+                            st.markdown(f"- {c[:300]}")
+                elif memory.last_error:
+                    st.caption(f"⚠️ {memory.last_error}")
+                else:
+                    st.caption(tr("memory_empty", lang))
+            st.markdown(answer_text)
+            if docs:
+                render_citation(docs, lang, key_suffix=str(conv_id))
+                render_feedback(conv_id, lang)
 
         st.session_state.messages.append(
             {"role": "assistant", "content": answer_text, "docs": docs, "lang": lang, "conv_id": conv_id}

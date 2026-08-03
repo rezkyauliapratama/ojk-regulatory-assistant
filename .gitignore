@@ -13,10 +13,11 @@ venv/
 # --- Generated data (NOT committed — reproducible from data/pdfs) ---
 data/extracted/
 data/chunks/
+data/embeddings/
 data/nyawa_memory.db*
 data/nyawa_memory.db.hnsw
-# Nyawa BGE embedder support files (downloaded by setup_nyawa.sh, ~23MB)
-nyawa/bge/
+# Nyawa binary + BGE embedder support files (installed by setup_nyawa.sh)
+nyawa/
 *.duckdb
 *.db
 
