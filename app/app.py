@@ -360,37 +360,48 @@ def main() -> None:
                     answer_text = f"{tr('error_prefix', lang)}: {e}"
                     docs, conv_id = [], None
 
-                # optional memory: store Q&A + show related past Q&A
-                memory = get_memory()
-                if use_memory and memory.available:
-                    mem_id = memory.store(
-                        content=f"Q: {query}\nA: {answer_text[:500]}",
-                        namespace="rag_qa",
-                        type_="chat",
-                    )
-                    related = memory.recall(query, namespace="rag_qa")
-                    if mem_id is None and memory.last_error:
-                        st.caption(f"⚠️ store failed: {memory.last_error}")
-                    # log recall metrics to Postgres for Grafana (best-effort)
-                    log_nyawa_recall(query, related)
+                # optional memory: store Q&A + show related past Q&A.
+                # Best-effort only - a failure here must NEVER prevent the
+                # answer from rendering, so everything is guarded.
+                try:
+                    memory = get_memory()
+                    if use_memory and memory.available:
+                        mem_id = memory.store(
+                            content=f"Q: {query}\nA: {answer_text[:500]}",
+                            namespace="rag_qa",
+                            type_="chat",
+                        )
+                        related = memory.recall(query, namespace="rag_qa")
+                        if mem_id is None and memory.last_error:
+                            st.caption(f"⚠️ store failed: {memory.last_error}")
+                        # log recall metrics to Postgres for Grafana (best-effort)
+                        log_nyawa_recall(query, related)
+                except Exception as e:  # noqa: BLE001
+                    st.caption(f"⚠️ memory: {type(e).__name__}: {e}")
 
             # render answer + related OUTSIDE the spinner block: content
             # placed inside st.spinner can be cleared when the spinner ends
-            if use_memory and memory.available:
-                if related:
-                    st.markdown(f"**{tr('memory_related', lang)}**")
-                    for r in related[:3]:
-                        c = r.get("content", "")
-                        if c:
-                            st.markdown(f"- {c[:300]}")
-                elif memory.last_error:
-                    st.caption(f"⚠️ {memory.last_error}")
-                else:
-                    st.caption(tr("memory_empty", lang))
+            try:
+                if use_memory and memory.available:
+                    if related:
+                        st.markdown(f"**{tr('memory_related', lang)}**")
+                        for r in related[:3]:
+                            c = r.get("content", "")
+                            if c:
+                                st.markdown(f"- {c[:300]}")
+                    elif memory.last_error:
+                        st.caption(f"⚠️ {memory.last_error}")
+                    else:
+                        st.caption(tr("memory_empty", lang))
+            except Exception:  # noqa: BLE001
+                pass
             st.markdown(answer_text)
-            if docs:
-                render_citation(docs, lang, key_suffix=str(conv_id))
-                render_feedback(conv_id, lang)
+            try:
+                if docs:
+                    render_citation(docs, lang, key_suffix=str(conv_id))
+                    render_feedback(conv_id, lang)
+            except Exception:  # noqa: BLE001
+                pass
 
         st.session_state.messages.append(
             {"role": "assistant", "content": answer_text, "docs": docs, "lang": lang, "conv_id": conv_id}
