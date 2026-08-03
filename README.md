@@ -14,6 +14,23 @@ retrieves the relevant regulation passages and answers with citations.
 
 ---
 
+## 🚀 Live Demo
+
+Try the running app right now - no setup needed.
+
+| | URL | Login |
+|---|---|---|
+| **Chat App** | https://banking-comp-assistant.rezkyaulia.dev/ | Password: `whatisit?` |
+| **Monitoring (Grafana)** | https://banking-comp-assistant.rezkyaulia.dev/grafana | Username: `reviewer` / Password: `grafana_llmzoomcamp_123` |
+
+Sample questions to try: "What are the QRIS requirements?" or
+"Apa ketentuan QRIS?" (Indonesian works too). See
+[docs/sample-questions.md](docs/sample-questions.md) for 10 more.
+The Grafana dashboard tracks queries, tokens, feedback, and cited
+documents over time.
+
+---
+
 ## 1. Problem
 
 Indonesian banking and fintech professionals need fast, accurate answers
