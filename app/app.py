@@ -236,10 +236,13 @@ def run_query(query: str, version: str, lang: str) -> tuple[str, list[dict], int
     return result["answer"], docs, conv_id
 
 
-def render_citation(docs: list[dict], lang: str, key_suffix: str = "x") -> None:
+def render_citation(docs: list[dict], lang: str, key_suffix: str = "x", translated: list[str] | None = None) -> None:
     st.subheader(tr("sources", lang, n=len(docs)))
     texts = [d["text"] for d in docs]
-    translated = translated_texts(texts, lang)
+    # translated texts are computed during the spinner (API call happens
+    # there) and stored on the message; render just displays them.
+    if translated is None:
+        translated = texts  # fallback: raw text (should not normally happen)
     for i, d in enumerate(docs, 1):
         pasal = f"{tr('article', lang)} {d['pasal']}" if d.get("pasal") else tr("general", lang)
         # unique key per (message, source) - two answers citing the same
@@ -335,7 +338,12 @@ def main() -> None:
                 if msg.get("docs"):
                     # unique suffix per message so repeated answers with the
                     # same cited doc+pasal do not collide on expander keys
-                    render_citation(msg["docs"], msg.get("lang", lang), key_suffix=str(msg.get("conv_id") or f"h{msg_idx}"))
+                    render_citation(
+                        msg["docs"],
+                        msg.get("lang", lang),
+                        key_suffix=str(msg.get("conv_id") or f"h{msg_idx}"),
+                        translated=msg.get("translated"),
+                    )
                 if msg.get("conv_id"):
                     render_feedback(msg["conv_id"], msg.get("lang", lang))
 
@@ -353,12 +361,22 @@ def main() -> None:
 
         with st.chat_message("assistant"):
             related: list[dict] = []
+            translated: list[str] = []
             with st.spinner(tr("searching", lang)):
                 try:
                     answer_text, docs, conv_id = run_query(query, version, lang)
                 except Exception as e:  # noqa: BLE001
                     answer_text = f"{tr('error_prefix', lang)}: {e}"
                     docs, conv_id = [], None
+
+                # translate source chunks NOW, inside the spinner - the Jina
+                # API call is slow (seconds) and must not happen after the
+                # spinner ends or the UI looks stuck/empty.
+                try:
+                    if docs:
+                        translated = translated_texts([d["text"] for d in docs], lang)
+                except Exception:  # noqa: BLE001
+                    translated = [d["text"] for d in docs]
 
                 # optional memory: store Q&A + show related past Q&A.
                 # Best-effort only - a failure here must NEVER prevent the
@@ -398,13 +416,20 @@ def main() -> None:
             st.markdown(answer_text)
             try:
                 if docs:
-                    render_citation(docs, lang, key_suffix=str(conv_id))
+                    render_citation(docs, lang, key_suffix=str(conv_id), translated=translated)
                     render_feedback(conv_id, lang)
             except Exception:  # noqa: BLE001
                 pass
 
         st.session_state.messages.append(
-            {"role": "assistant", "content": answer_text, "docs": docs, "lang": lang, "conv_id": conv_id}
+            {
+                "role": "assistant",
+                "content": answer_text,
+                "docs": docs,
+                "lang": lang,
+                "conv_id": conv_id,
+                "translated": translated,
+            }
         )
 
 
