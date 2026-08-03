@@ -302,8 +302,11 @@ def main() -> None:
                 saved = memory.recent_questions()
                 if saved:
                     with st.expander(f"{tr('saved_questions', lang)} ({len(saved)})"):
-                        for q in saved:
-                            if st.button(f"🔁 {q}", key=f"saved_{q}", help=tr("ask_again", lang)):
+                        for i, q in enumerate(saved):
+                            # key must be unique even for duplicate/near-duplicate
+                            # questions (same text would collide on 'saved_{q}')
+                            key = f"saved_q_{i}_{abs(hash(q))}"
+                            if st.button(f"🔁 {q}", key=key, help=tr("ask_again", lang)):
                                 st.session_state.preset_query = q
                                 st.rerun()
                 else:
