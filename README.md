@@ -239,6 +239,14 @@ You should see relevant retrieval results (e.g. for the query
 "QRIS"). If you get `relation regulatory.regulation_chunks does not
 exist`, Step 6 did not finish or failed.
 
+### Step 7b: Run unit tests (optional)
+
+```bash
+pip install pytest          # not in requirements.txt (dev dependency)
+python -m pytest tests/ -v
+# 6 passed - pure-function tests (no API keys, no DB, no network)
+```
+
 ### Step 8: Open the UI
 
 ```bash
@@ -343,6 +351,8 @@ python scripts/verify.py         # smoke test
 │   ├── llm_flow.py         # 2 prompt versions (V1 strict citation / V2 structured)
 │   ├── conversations.py    # Postgres logging (for Grafana)
 │   └── memory_layer.py     # Nyawa memory (optional bonus feature)
+├── tests/
+│   └── test_rag_engine.py  # unit tests for pure functions (pytest)
 ├── scripts/
 │   ├── fetch_pdfs.py       # download from OJK/BI (browser UA + verify=False)
 │   ├── extract_text.py     # PDF -> text
