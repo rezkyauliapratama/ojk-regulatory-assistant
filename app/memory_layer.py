@@ -129,18 +129,34 @@ class MemoryLayer:
             normalized.append({k.lower(): v for k, v in item.items()})
         return normalized
 
-    def recent_questions(self, namespace: str = "rag_qa", limit: int = 20) -> list[str]:
-        """Return stored question strings (most recent first, best-effort).
+    def recent_questions(self, namespace: str = "rag_qa", limit: int = 10) -> list[str]:
+        """Return the most recent stored questions, newest first.
 
         Nyawa has no 'list all' MCP tool, so we recall with a generic
-        query that matches everything, then parse the 'Q: <question>'
-        prefix that app.py stores. Returns [] on any failure.
+        query that matches everything, sort by CreatedAt (ISO-8601,
+        lexicographically sortable) descending, then parse the
+        'Q: <question>' prefix that app.py stores. Returns [] on any
+        failure.
         """
-        results = self.recall("conversation history Q&A", namespace=namespace, limit=limit)
+        results = self.recall("conversation history Q&A", namespace=namespace, limit=max(limit * 5, 50))
+        # newest first. CreatedAt has second precision (ties possible when
+        # several Q&A are stored within one second), so break ties with the
+        # nanosecond part of the memory ID (mem_<unix_nano>).
+        def _ts(r: dict) -> tuple[str, int]:
+            ts = r.get("created_at") or ""
+            nano = 0
+            mem_id = str(r.get("id") or "")
+            if mem_id.startswith("mem_") and mem_id[4:].isdigit():
+                nano = int(mem_id[4:])
+            return (ts, nano)
+
+        results.sort(key=_ts, reverse=True)
         questions = []
         for r in results:
             content = r.get("content", "") or ""
             first_line = content.split("\n", 1)[0]
             if first_line.startswith("Q: "):
                 questions.append(first_line[3:].strip())
+            if len(questions) >= limit:
+                break
         return questions
