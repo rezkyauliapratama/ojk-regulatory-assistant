@@ -274,6 +274,52 @@ regulations they target. Full list with tips: see
 | 9 | What does the P2SK law (UU 4/2023) change for financial sector supervision? | Apa yang diubah UU 4/2023 (P2SK) terhadap pengawasan sektor keuangan? | UU 4/2023 |
 | 10 | What are the requirements for banks using fintech innovation (ITSK) under POJK 30/2025? | Apa saja persyaratan bank dalam menggunakan inovasi teknologi sektor keuangan (ITSK) berdasarkan POJK 30/2025? | POJK 30/2025 |
 
+### App screenshots
+
+Six screenshots of the running app, in order: login, home, search
+flow, answer with citations, memory recall, and the knowledge base.
+
+**1. Login page**
+
+![Login page](docs/screenshots/01-login-page.png)
+
+Password-protected entry point (APP_PASSWORD from `.env`).
+
+**2. Home - knowledge base overview**
+
+![Home - knowledge base overview](docs/screenshots/02-home-knowledge-base.png)
+
+Landing view: app title, subtitle, and the collapsible knowledge base
+panel listing all 15 regulations.
+
+**3. Knowledge base detail**
+
+![Knowledge base detail](docs/screenshots/03-knowledge-base-detail.png)
+
+The knowledge base expanded: regulations grouped by topic
+(AI / Technology, Payment Systems, Banking).
+
+**4. Search in progress**
+
+![Search in progress](docs/screenshots/04-searching-regulations.png)
+
+The engine searching across all 15 regulations (query rewriting +
+hybrid retrieval + reranking).
+
+**5. Answer with citations & sources**
+
+![Answer with citations and sources](docs/screenshots/05-answer-with-sources.png)
+
+A generated answer with inline citations (PADG 3/2025 pasal),
+expandable sources, and the 👍 / 👎 feedback buttons.
+
+**6. Related past conversations (Nyawa memory)**
+
+![Related past conversations](docs/screenshots/06-related-conversations.png)
+
+Cross-session memory recall: related past Q&A shown above the current
+answer (requires the "Use session memory (Nyawa)" toggle).
+
 ### Run from local (dev mode, no Streamlit container)
 
 If you prefer running the app directly on your machine (not in a
@@ -379,7 +425,8 @@ python scripts/verify.py         # smoke test
 │       ├── retrieval_eval.json  # HitRate@5 / MRR@5 per strategy
 │       └── llm_eval.json        # judge scores per prompt version
 ├── docs/
-│   └── sample-questions.md # 10 bilingual sample questions + tips
+│   ├── sample-questions.md # 10 bilingual sample questions + tips
+│   └── screenshots/        # 6 app screenshots (login, UI, memory recall)
 ├── grafana/
 │   ├── Dockerfile              # custom image with provisioning baked in
 │   ├── provisioning/           # datasource + dashboard provider
