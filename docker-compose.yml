@@ -27,11 +27,13 @@ services:
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
-      # Grafana di-serve di subpath /grafana via HTTPS LB path routing.
-      # WAJIB: root_url + serve_from_sub_path, kalau tidak redirect ke /login
-      # (root) dan gak pernah sampai ke login page yang benar.
-      GF_SERVER_ROOT_URL: https://banking-comp-assistant.rezkyaulia.dev/grafana/
-      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      # Grafana di balik HTTPS LB path routing (/grafana) butuh root_url + subpath.
+      # Default = local dev (localhost:3000, tanpa subpath).
+      # Untuk production, set di .env:
+      #   GRAFANA_ROOT_URL=https://banking-comp-assistant.rezkyaulia.dev/grafana/
+      #   GRAFANA_SERVE_FROM_SUB_PATH=true
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:3000}
+      GF_SERVER_SERVE_FROM_SUB_PATH: ${GRAFANA_SERVE_FROM_SUB_PATH:-false}
       POSTGRES_USER: ${POSTGRES_USER:-rag}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me}
       POSTGRES_DB: ${POSTGRES_DB:-rag_db}
